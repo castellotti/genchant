@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://vts2xl0t0xub"]
+[gd_scene load_steps=31 format=3 uid="uid://vts2xl0t0xub"]
 
 [ext_resource type="PackedScene" uid="uid://biunegs8tkvn0" path="res://addons/godot_vision/VisionVolumeCamera.tscn" id="1_01v6w"]
 [ext_resource type="Script" path="res://main.gd" id="1_ms3mn"]
@@ -29,12 +29,6 @@ glow_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_exuxr"]
 size = Vector3(15.84, 8.8, 13.2)
-
-[sub_resource type="BoxMesh" id="BoxMesh_gbsd5"]
-size = Vector3(0.1, 0.1, 0.1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_0qrx8"]
-size = Vector3(0.1, 0.1, 0.1)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_xween"]
 animation = &"Grip"
@@ -120,22 +114,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
 
 [node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 0.942057, 0.335452, 0, -0.335452, 0.942057, 0, 2.247, 6.057)
-
-[node name="LeftXRController3D" type="XRController3D" parent="XROrigin3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
-tracker = &"left_hand"
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/LeftXRController3D"]
-visible = false
-mesh = SubResource("BoxMesh_gbsd5")
-
-[node name="RightXRController3D" type="XRController3D" parent="XROrigin3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
-tracker = &"right_hand"
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="XROrigin3D/RightXRController3D"]
-visible = false
-mesh = SubResource("BoxMesh_0qrx8")
 
 [node name="LeftHand" type="XRController3D" parent="XROrigin3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
