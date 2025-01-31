@@ -62,7 +62,7 @@ func visualize_data_remote(entry: Dictionary, traffic_data: Dictionary) -> void:
         var height_ratio: float = float(total_traffic) / float(max_traffic)
 
         # Load the column script
-        var column_script = load("res://common/column.gd")
+        var column_script = load("res://scripts/common/column.gd")
         if column_script == null:
             print("Error: Script not loaded properly.")
             return
@@ -78,8 +78,7 @@ func visualize_data_remote(entry: Dictionary, traffic_data: Dictionary) -> void:
         column.scale = Vector3(1, height_ratio * 5, 1)  # Scale the height by the ratio, keep width and depth the same
 
         # Set the position of the column in the scene
-        #column.transform.origin = Vector3(index * 0.2, (height_ratio * 5) - 2, 7)
-        column.transform.origin = Vector3(index * 0.2, (height_ratio * 2.5) - 2, 6)
+        column.transform.origin = Vector3(index * 0.2, (height_ratio * 2.5), 6)
 
         # Adjust position by custom parameters
         column.translate(Vector3(entry["transform"][0], entry["transform"][1], entry["transform"][2]))

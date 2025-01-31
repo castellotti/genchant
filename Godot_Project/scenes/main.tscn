@@ -1,0 +1,302 @@
+[gd_scene load_steps=39 format=3 uid="uid://vts2xl0t0xub"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_leo5k"]
+[ext_resource type="PackedScene" uid="uid://biunegs8tkvn0" path="res://addons/godot_vision/VisionVolumeCamera.tscn" id="2_ft260"]
+[ext_resource type="PackedScene" uid="uid://bq86r4yll8po" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_fullglove_low.tscn" id="3_iv1p7"]
+[ext_resource type="PackedScene" uid="uid://fiul51tsyoop" path="res://addons/godot-xr-tools/functions/function_teleport.tscn" id="4_khjqt"]
+[ext_resource type="PackedScene" uid="uid://bwr0eqi231lf0" path="res://assets/meshes/control_pad/control_pad_location_left.tscn" id="5_d0clo"]
+[ext_resource type="PackedScene" uid="uid://xqimcf20s2jp" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_fullglove_low.tscn" id="6_kj28r"]
+[ext_resource type="PackedScene" uid="uid://b6bk2pj8vbj28" path="res://addons/godot-xr-tools/functions/movement_turn.tscn" id="7_na8ko"]
+[ext_resource type="PackedScene" uid="uid://deyk5frilshws" path="res://assets/meshes/control_pad/control_pad_location_right.tscn" id="8_sx1hh"]
+[ext_resource type="PackedScene" uid="uid://diyu06cw06syv" path="res://addons/godot-xr-tools/player/player_body.tscn" id="9_mtl50"]
+[ext_resource type="PackedScene" uid="uid://ct3p5sgwvkmva" path="res://assets/meshes/control_pad/control_pad.tscn" id="10_k0x1i"]
+[ext_resource type="Script" path="res://scripts/joystick_touch_pad/first_person_player.gd" id="11_jgp37"]
+[ext_resource type="PackedScene" uid="uid://dy6nxqv5ntssf" path="res://scenes/sphere/sphere.tscn" id="12_bm3gb"]
+[ext_resource type="PackedScene" uid="uid://35vchcf8slhs" path="res://scenes/bar_chart/bar_chart.tscn" id="13_nwlmj"]
+[ext_resource type="PackedScene" uid="uid://bb0dcinj3d5r" path="res://scenes/joystick_touch_pad/joystick_touch_pad.tscn" id="14_y6xqd"]
+[ext_resource type="Texture2D" uid="uid://kkl1n1xsb8ks" path="res://assets/icons/ui/joystick_touch_pad/home.png" id="15_pnyyo"]
+[ext_resource type="Script" path="res://scripts/joystick_touch_pad/home_button.gd" id="16_170kx"]
+[ext_resource type="Texture2D" uid="uid://dwkcc3bu0nttg" path="res://assets/icons/ui/joystick_touch_pad/circle_medium.png" id="17_ugwp8"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sa7ok"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_htamn"]
+sky_material = SubResource("ProceduralSkyMaterial_sa7ok")
+
+[sub_resource type="Environment" id="Environment_762w5"]
+sky = SubResource("Sky_htamn")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_l0ipt"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_exuxr"]
+size = Vector3(15.84, 8.8, 13.2)
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_g3usb"]
+animation = &"Grip"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dao00"]
+animation = &"Grip"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_gjoaq"]
+filter_enabled = true
+filters = ["Armature/Skeleton3D:Little_Distal_L", "Armature/Skeleton3D:Little_Intermediate_L", "Armature/Skeleton3D:Little_Metacarpal_L", "Armature/Skeleton3D:Little_Proximal_L", "Armature/Skeleton3D:Middle_Distal_L", "Armature/Skeleton3D:Middle_Intermediate_L", "Armature/Skeleton3D:Middle_Metacarpal_L", "Armature/Skeleton3D:Middle_Proximal_L", "Armature/Skeleton3D:Ring_Distal_L", "Armature/Skeleton3D:Ring_Intermediate_L", "Armature/Skeleton3D:Ring_Metacarpal_L", "Armature/Skeleton3D:Ring_Proximal_L", "Armature/Skeleton3D:Thumb_Distal_L", "Armature/Skeleton3D:Thumb_Metacarpal_L", "Armature/Skeleton3D:Thumb_Proximal_L", "Armature/Skeleton:Little_Distal_L", "Armature/Skeleton:Little_Intermediate_L", "Armature/Skeleton:Little_Proximal_L", "Armature/Skeleton:Middle_Distal_L", "Armature/Skeleton:Middle_Intermediate_L", "Armature/Skeleton:Middle_Proximal_L", "Armature/Skeleton:Ring_Distal_L", "Armature/Skeleton:Ring_Intermediate_L", "Armature/Skeleton:Ring_Proximal_L", "Armature/Skeleton:Thumb_Distal_L", "Armature/Skeleton:Thumb_Proximal_L"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_0dghb"]
+animation = &"Grip 5"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_jbx02"]
+filter_enabled = true
+filters = ["Armature/Skeleton3D:Index_Distal_L", "Armature/Skeleton3D:Index_Intermediate_L", "Armature/Skeleton3D:Index_Metacarpal_L", "Armature/Skeleton3D:Index_Proximal_L", "Armature/Skeleton:Index_Distal_L", "Armature/Skeleton:Index_Intermediate_L", "Armature/Skeleton:Index_Proximal_L"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_ilkxl"]
+graph_offset = Vector2(-536, 11)
+nodes/ClosedHand1/node = SubResource("AnimationNodeAnimation_g3usb")
+nodes/ClosedHand1/position = Vector2(-600, 300)
+nodes/ClosedHand2/node = SubResource("AnimationNodeAnimation_dao00")
+nodes/ClosedHand2/position = Vector2(-360, 300)
+nodes/Grip/node = SubResource("AnimationNodeBlend2_gjoaq")
+nodes/Grip/position = Vector2(0, 20)
+nodes/OpenHand/node = SubResource("AnimationNodeAnimation_0dghb")
+nodes/OpenHand/position = Vector2(-600, 100)
+nodes/Trigger/node = SubResource("AnimationNodeBlend2_jbx02")
+nodes/Trigger/position = Vector2(-360, 20)
+node_connections = [&"Grip", 0, &"Trigger", &"Grip", 1, &"ClosedHand2", &"Trigger", 0, &"OpenHand", &"Trigger", 1, &"ClosedHand1", &"output", 0, &"Grip"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_eol0q"]
+animation = &"Grip"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pps0r"]
+animation = &"Grip"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_dwglt"]
+filter_enabled = true
+filters = ["Armature/Skeleton3D:Little_Distal_R", "Armature/Skeleton3D:Little_Intermediate_R", "Armature/Skeleton3D:Little_Metacarpal_R", "Armature/Skeleton3D:Little_Proximal_R", "Armature/Skeleton3D:Middle_Distal_R", "Armature/Skeleton3D:Middle_Intermediate_R", "Armature/Skeleton3D:Middle_Metacarpal_R", "Armature/Skeleton3D:Middle_Proximal_R", "Armature/Skeleton3D:Ring_Distal_R", "Armature/Skeleton3D:Ring_Intermediate_R", "Armature/Skeleton3D:Ring_Metacarpal_R", "Armature/Skeleton3D:Ring_Proximal_R", "Armature/Skeleton3D:Thumb_Distal_R", "Armature/Skeleton3D:Thumb_Metacarpal_R", "Armature/Skeleton3D:Thumb_Proximal_R", "Armature/Skeleton:Little_Distal_R", "Armature/Skeleton:Little_Intermediate_R", "Armature/Skeleton:Little_Proximal_R", "Armature/Skeleton:Middle_Distal_R", "Armature/Skeleton:Middle_Intermediate_R", "Armature/Skeleton:Middle_Proximal_R", "Armature/Skeleton:Ring_Distal_R", "Armature/Skeleton:Ring_Intermediate_R", "Armature/Skeleton:Ring_Proximal_R", "Armature/Skeleton:Thumb_Distal_R", "Armature/Skeleton:Thumb_Proximal_R"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_swt73"]
+animation = &"Grip 5"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_aluu7"]
+filter_enabled = true
+filters = ["Armature/Skeleton3D:Index_Distal_R", "Armature/Skeleton3D:Index_Intermediate_R", "Armature/Skeleton3D:Index_Metacarpal_R", "Armature/Skeleton3D:Index_Proximal_R", "Armature/Skeleton:Index_Distal_R", "Armature/Skeleton:Index_Intermediate_R", "Armature/Skeleton:Index_Proximal_R"]
+
+[sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_gmr6a"]
+graph_offset = Vector2(-552.664, 107.301)
+nodes/ClosedHand1/node = SubResource("AnimationNodeAnimation_eol0q")
+nodes/ClosedHand1/position = Vector2(-600, 300)
+nodes/ClosedHand2/node = SubResource("AnimationNodeAnimation_pps0r")
+nodes/ClosedHand2/position = Vector2(-360, 300)
+nodes/Grip/node = SubResource("AnimationNodeBlend2_dwglt")
+nodes/Grip/position = Vector2(0, 40)
+nodes/OpenHand/node = SubResource("AnimationNodeAnimation_swt73")
+nodes/OpenHand/position = Vector2(-600, 100)
+nodes/Trigger/node = SubResource("AnimationNodeBlend2_aluu7")
+nodes/Trigger/position = Vector2(-360, 40)
+node_connections = [&"Grip", 0, &"Trigger", &"Grip", 1, &"ClosedHand2", &"Trigger", 0, &"OpenHand", &"Trigger", 1, &"ClosedHand1", &"output", 0, &"Grip"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hcbrp"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_an5qh"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.25098)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_cd5f0"]
+material = SubResource("StandardMaterial3D_an5qh")
+size = Vector2(100, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_16cv4"]
+size = Vector3(100, 1, 100)
+
+[node name="main" type="Node3D"]
+script = ExtResource("1_leo5k")
+
+[node name="env" type="Node" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="env"]
+environment = SubResource("Environment_762w5")
+camera_attributes = SubResource("CameraAttributesPractical_l0ipt")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="env"]
+transform = Transform3D(0.707106, 0.353553, -0.612372, 0, 0.866025, 0.5, 0.707106, -0.353553, 0.612372, 0, 0, 0)
+
+[node name="objects" type="Node" parent="."]
+
+[node name="VisionVolumeCamera" parent="objects" instance=ExtResource("2_ft260")]
+
+[node name="CollisionShape3D" parent="objects/VisionVolumeCamera" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.05989)
+shape = SubResource("BoxShape3D_exuxr")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+
+[node name="XRCamera3D" type="XRCamera3D" parent="objects/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 0.942057, 0.335452, 0, -0.335452, 0.942057, 0, 2.247, 6.057)
+
+[node name="LeftHand" type="XRController3D" parent="objects/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1, -0.5)
+tracker = &"left_hand"
+pose = &"aim"
+
+[node name="LeftHand" parent="objects/XROrigin3D/LeftHand" instance=ExtResource("3_iv1p7")]
+
+[node name="Skeleton3D" parent="objects/XROrigin3D/LeftHand/LeftHand/Hand_low_L/Armature" index="0"]
+bones/1/rotation = Quaternion(0.323537, -2.56588e-05, -0.0272204, 0.945824)
+bones/2/rotation = Quaternion(-0.0904441, -0.0415175, -0.166293, 0.981042)
+bones/3/rotation = Quaternion(-0.0466199, 0.020971, 0.0103276, 0.998639)
+bones/5/rotation = Quaternion(-0.00128455, -0.0116081, -0.0168259, 0.99979)
+bones/6/rotation = Quaternion(0.102925, -0.00993208, -0.00794416, 0.994608)
+bones/7/rotation = Quaternion(-0.012859, -0.0236108, -0.323258, 0.945929)
+bones/8/rotation = Quaternion(0.0120575, -0.00929194, -0.247472, 0.968775)
+bones/10/rotation = Quaternion(-0.0357539, -0.000400032, 0.00636764, 0.99934)
+bones/11/rotation = Quaternion(-0.00264964, -0.00114471, -0.125992, 0.992027)
+bones/12/rotation = Quaternion(0.0394225, 0.00193393, -0.228074, 0.972843)
+bones/13/rotation = Quaternion(-0.0123395, -0.00881294, -0.280669, 0.959685)
+bones/15/rotation = Quaternion(-0.0702656, 0.0101908, -0.0243307, 0.99718)
+bones/16/rotation = Quaternion(-0.0320634, -0.00223624, -0.0686366, 0.997124)
+bones/17/rotation = Quaternion(0.0253452, 0.00812462, -0.249005, 0.968136)
+bones/18/rotation = Quaternion(0.00252232, 0.00788073, -0.243204, 0.96994)
+bones/20/rotation = Quaternion(-0.0917369, 0.0203027, -0.010183, 0.995524)
+bones/21/rotation = Quaternion(-0.0625182, -0.000225721, -0.115393, 0.991351)
+bones/22/rotation = Quaternion(0.0585786, 0.0216483, -0.269905, 0.96086)
+bones/23/rotation = Quaternion(0.00687177, -0.00357275, -0.211953, 0.977249)
+
+[node name="AnimationTree" parent="objects/XROrigin3D/LeftHand/LeftHand" index="1"]
+root_node = NodePath("../Hand_low_L")
+tree_root = SubResource("AnimationNodeBlendTree_ilkxl")
+
+[node name="FunctionTeleport" parent="objects/XROrigin3D/LeftHand" instance=ExtResource("4_khjqt")]
+
+[node name="ControlPadLocationLeft" parent="objects/XROrigin3D/LeftHand" instance=ExtResource("5_d0clo")]
+
+[node name="RightHand" type="XRController3D" parent="objects/XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, -0.5)
+tracker = &"right_hand"
+pose = &"aim"
+
+[node name="RightHand" parent="objects/XROrigin3D/RightHand" instance=ExtResource("6_kj28r")]
+
+[node name="Skeleton3D" parent="objects/XROrigin3D/RightHand/RightHand/Hand_low_R/Armature" index="0"]
+bones/1/rotation = Quaternion(0.323537, 2.56588e-05, 0.0272204, 0.945824)
+bones/2/rotation = Quaternion(-0.0904441, 0.0415175, 0.166293, 0.981042)
+bones/3/rotation = Quaternion(-0.0466199, -0.020971, -0.0103276, 0.998639)
+bones/5/rotation = Quaternion(-0.00128455, 0.0116081, 0.0168259, 0.99979)
+bones/6/rotation = Quaternion(0.102925, 0.00993208, 0.00794419, 0.994608)
+bones/7/rotation = Quaternion(-0.012859, 0.0236108, 0.323258, 0.945929)
+bones/8/rotation = Quaternion(0.0120575, 0.00929193, 0.247472, 0.968775)
+bones/10/rotation = Quaternion(-0.0357539, 0.000400032, -0.00636763, 0.99934)
+bones/11/rotation = Quaternion(-0.00264964, 0.00114471, 0.125992, 0.992027)
+bones/12/rotation = Quaternion(0.0394225, -0.00193393, 0.228074, 0.972843)
+bones/13/rotation = Quaternion(-0.0123395, 0.00881294, 0.280669, 0.959685)
+bones/15/rotation = Quaternion(-0.0702656, -0.0101908, 0.0243307, 0.99718)
+bones/16/rotation = Quaternion(-0.0320634, 0.00223624, 0.0686366, 0.997124)
+bones/17/rotation = Quaternion(0.0253452, -0.00812462, 0.249005, 0.968136)
+bones/18/rotation = Quaternion(0.00252233, -0.00788073, 0.243204, 0.96994)
+bones/20/rotation = Quaternion(-0.0917369, -0.0203027, 0.010183, 0.995524)
+bones/21/rotation = Quaternion(-0.0625182, 0.000225722, 0.115393, 0.991351)
+bones/22/rotation = Quaternion(0.0585786, -0.0216483, 0.269905, 0.96086)
+bones/23/rotation = Quaternion(0.00687177, 0.00357275, 0.211953, 0.977249)
+
+[node name="AnimationTree" parent="objects/XROrigin3D/RightHand/RightHand" index="1"]
+root_node = NodePath("../Hand_low_R")
+tree_root = SubResource("AnimationNodeBlendTree_gmr6a")
+
+[node name="MovementTurn" parent="objects/XROrigin3D/RightHand" instance=ExtResource("7_na8ko")]
+
+[node name="ControlPadLocationRight" parent="objects/XROrigin3D/RightHand" instance=ExtResource("8_sx1hh")]
+
+[node name="PlayerBody" parent="objects/XROrigin3D" instance=ExtResource("9_mtl50")]
+
+[node name="ControlPad" parent="objects/XROrigin3D" instance=ExtResource("10_k0x1i")]
+
+[node name="joystick_touch_pad" type="CharacterBody3D" parent="objects" node_paths=PackedStringArray("joystick_touch_pad")]
+up_direction = Vector3(0, 0, 1)
+script = ExtResource("11_jgp37")
+joystick_touch_pad = NodePath("../../ui/joystick_touch_pad")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="objects/joystick_touch_pad"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_hcbrp")
+
+[node name="head" type="Node3D" parent="objects/joystick_touch_pad"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 8)
+
+[node name="Camera3D" type="Camera3D" parent="objects/joystick_touch_pad/head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.247, 6.057)
+
+[node name="stage" type="Node3D" parent="."]
+
+[node name="SphereNode3D" parent="stage" instance=ExtResource("12_bm3gb")]
+
+[node name="BarChart" parent="stage" instance=ExtResource("13_nwlmj")]
+
+[node name="Floor" type="StaticBody3D" parent="stage"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="stage/Floor"]
+mesh = SubResource("PlaneMesh_cd5f0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="stage/Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_16cv4")
+
+[node name="ui" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="joystick_touch_pad" parent="ui" instance=ExtResource("14_y6xqd")]
+layout_mode = 1
+
+[node name="home_button" type="TextureButton" parent="ui"]
+modulate = Color(1, 1, 1, 0.454902)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -64.0
+offset_top = 27.0
+offset_right = -48.0
+offset_bottom = 64.0
+grow_horizontal = 0
+texture_normal = ExtResource("15_pnyyo")
+script = ExtResource("16_170kx")
+
+[node name="WebCanvasLayer" type="CanvasLayer" parent="ui"]
+
+[node name="WebButton" type="Button" parent="ui/WebCanvasLayer"]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Enter Immersive (XR)"
+
+[node name="right_side_buttons" type="Control" parent="ui"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -20.0
+offset_bottom = 20.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="jump_button" type="TouchScreenButton" parent="ui/right_side_buttons"]
+modulate = Color(1, 1, 1, 0.298039)
+position = Vector2(-155, -142)
+scale = Vector2(0.465, 0.465)
+texture_normal = ExtResource("17_ugwp8")
+
+[connection signal="pressed" from="ui/right_side_buttons/jump_button" to="objects/joystick_touch_pad" method="on_jump_button_pressed"]
+
+[editable path="objects/VisionVolumeCamera"]
+[editable path="objects/XROrigin3D/LeftHand/LeftHand"]
+[editable path="objects/XROrigin3D/LeftHand/LeftHand/Hand_low_L"]
+[editable path="objects/XROrigin3D/RightHand/RightHand"]
+[editable path="objects/XROrigin3D/RightHand/RightHand/Hand_low_R"]
