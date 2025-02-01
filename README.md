@@ -52,10 +52,10 @@ The Styx project provides a boundary between your devices and the Underworld of 
 ### WebXR
 - Reference: Godot [Exporting for the Web](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_web.html) guide
 - Generate a Web Export to a build directory with name `index.html`
-- Transfer all files from build directory to `styx-os` at path `/srv/styx-web/html`
+- Transfer all files from build directory to [styx-os](https://github.com/Jigsaw-Studio/styx-os) at path `/srv/styx-web/html`
 - Example all-in-one command on macOS:
     ```
-    /Applications/Godot\ versions/Godot\ 4.3.app/Contents/MacOS/Godot \
+    /Applications/Godot\ 4.3.app/Contents/MacOS/Godot \
   	  --path $HOME/styx-godot/Godot_Project \
   	  --headless \
   	  --export-release "Web" \
