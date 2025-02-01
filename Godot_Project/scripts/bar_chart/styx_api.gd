@@ -161,7 +161,7 @@ func process_data(body):
         else:
             print("No data found in the JSON response")
     else:
-        print("Failed to parse JSON: ", json.error_string)
+        print("Failed to parse JSON: ", body)
 
 func calculate_traffic_remote(parsed_data: Array) -> Dictionary:
     return nv.calculate_traffic_remote(parsed_data)
