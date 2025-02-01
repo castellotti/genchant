@@ -70,7 +70,7 @@ The Styx project provides a boundary between your devices and the Underworld of 
 - In most cases the default settings for exporting to iOS should be sufficient
 
 ## Credits
-- Godot XR Tools: [Website](https://godotvr.github.io/godot-xr-tools/), [GitHub](https://github.com/GodotVR/godot-xr-tools) (special thanks @BastiaanOlij)
-- [GodotVision](https://godot.vision/) (special thanks @kevinw)
-- [Pocket Godot](https://github.com/lukky-nl/Pocket-Godot) (special thanks @lukky-nl)
+- Godot XR Tools: [Website](https://godotvr.github.io/godot-xr-tools/), [GitHub](https://github.com/GodotVR/godot-xr-tools) (special thanks [Bastiaan Olij](https://github.com/BastiaanOlij))
+- [GodotVision](https://godot.vision/) (special thanks [Kevin Watters](https://github.com/kevinw))
+- [Pocket Godot](https://github.com/lukky-nl/Pocket-Godot) (special thanks [@lukky-nl](https://github.com/lukky-nl))
 - David Snopek's [How to make a VR game for WebXR with Godot 4](https://www.snopekgames.com/tutorial/2023/how-make-vr-game-webxr-godot-4)
