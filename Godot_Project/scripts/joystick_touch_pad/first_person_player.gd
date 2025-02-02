@@ -47,9 +47,9 @@ func _physics_process(delta):
     # Handle camera control with Input Map actions
     var camera_look = Vector2.ZERO
     if Input.is_action_pressed("camera_left"):
-        camera_look.x -= CAMERA_LOOK_SPEED
-    if Input.is_action_pressed("camera_right"):
         camera_look.x += CAMERA_LOOK_SPEED
+    if Input.is_action_pressed("camera_right"):
+        camera_look.x -= CAMERA_LOOK_SPEED
     if Input.is_action_pressed("camera_up"):
         camera_look.y += CAMERA_LOOK_SPEED
     if Input.is_action_pressed("camera_down"):
