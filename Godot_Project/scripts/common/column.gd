@@ -4,8 +4,8 @@ var color: Array = [1, 1, 1]  # Default white
 var label_enabled: bool = false  # Default: no label
 var x_width_and_z_depth: float = 0.1
 
-# Toggle whether to use the glow shader. (True by default.)
-var use_glow_shader: bool = true
+# Toggle whether to use the glow shader. (True by default but not supported in visionOS)
+var use_glow_shader: bool = not Globals.is_running_in_visionos
 
 func _init(column_color: Array = [1, 1, 1], label_content: String = "", label_show: bool = false):
     self.color = column_color

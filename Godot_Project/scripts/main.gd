@@ -1,15 +1,12 @@
 extends Node3D
 
-var xr_interface : XRInterface
-var passthrough_enabled : bool = false
-var is_running_in_web : bool = OS.get_name() == "Web" or OS.get_name() == "HTML5"
-var joystick_touch_pad_enabled : bool = false
 var interface_alerts : bool = false
+var passthrough_enabled : bool = false
+var xr_interface : XRInterface
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
 
-    if not is_running_in_web:
+    if not Globals.is_running_in_web:
         $ui/WebCanvasLayer.visible = false
         xr_interface = XRServer.find_interface("OpenXR")
         if xr_interface and xr_interface.is_initialized():
@@ -23,7 +20,7 @@ func _ready():
             passthrough_enabled = enable_passthrough()
         else:
             print("OpenXR not initialized, please check if your headset is connected")
-            joystick_touch_pad_enabled = true
+            Globals.joystick_touch_pad_enabled = true
 
     else:        
         $ui/WebCanvasLayer.visible = true
@@ -46,10 +43,9 @@ func _ready():
             xr_interface.is_session_supported("immersive-vr")
             #xr_interface.is_session_supported("immersive-ar")
         else :
-            joystick_touch_pad_enabled = true
+            Globals.joystick_touch_pad_enabled = true
     
-    update_joystick_touch_pad(joystick_touch_pad_enabled)
-        
+    update_joystick_touch_pad(Globals.joystick_touch_pad_enabled)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):

@@ -20,6 +20,7 @@ config/icon="res://assets/icons/godot/styx.png"
 GodotVision="*res://addons/godot_vision/GodotVision_autoload.tscn"
 XRToolsUserSettings="*res://addons/godot-xr-tools/user_settings/user_settings.gd"
 XRToolsRumbleManager="*res://addons/godot-xr-tools/rumble/rumble_manager.gd"
+Globals="*res://scripts/common/globals.gd"
 
 [display]
 
