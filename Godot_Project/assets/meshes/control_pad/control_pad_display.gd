@@ -66,4 +66,3 @@ func _on_main_scene_pressed():
 # Called by the tweening to change the world scale
 func _set_world_scale(scale : float) -> void:
     XRServer.world_scale = scale
-
