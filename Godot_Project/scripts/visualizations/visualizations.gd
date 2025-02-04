@@ -4,20 +4,28 @@ extends Node3D
 var windows: Dictionary = {}
 
 func _ready() -> void:
-    # For example, add a LeftWindow but keep it hidden until needed.
+    initialize_visualizations()
+
+func initialize_visualizations() -> void:
     var left_window = LeftWindow.new()
-    #left_window.hide()  # not visible initially
+    left_window.hide()
+    left_window.set_process(false)
     add_child(left_window)
     windows["left"] = left_window
-
+   
+    var right_window = RightWindow.new()
+    right_window.hide()
+    right_window.set_process(false)
+    add_child(right_window)
+    windows["right"] = right_window
+    
     var top_window = TopWindow.new()
+    top_window.hide()
+    top_window.set_process(false)
     add_child(top_window)
-    windows["top"] = top_window
-        
-    # Optionally, disable processing for hidden nodes:
-    #left_window.set_process(false)
+    windows["top"] = top_window    
 
-# Call this to turn a visualization on:
+# Turn on visualization
 func show_window(window_name: String) -> void:
     if windows.has(window_name):
         var win = windows[window_name]
@@ -26,13 +34,13 @@ func show_window(window_name: String) -> void:
     else:
         print("No window with name '%s'" % window_name)
 
-# And call this to turn it off completely:
+# Turn off visualization
 func hide_window(window_name: String) -> void:
     if windows.has(window_name):
         var win = windows[window_name]
         win.hide()
         win.set_process(false)
-        # Optionally, remove it from the scene tree:
+        # Optionally, remove from the scene tree
         # win.queue_free()
         # windows.erase(window_name)
     else:

@@ -2,6 +2,7 @@ extends Node3D
 
 var interface_alerts : bool = false
 var passthrough_enabled : bool = false
+var visualizations_scene : Node3D
 var xr_interface : XRInterface
 
 func _ready():
@@ -46,6 +47,10 @@ func _ready():
             Globals.joystick_touch_pad_enabled = true
     
     update_joystick_touch_pad(Globals.joystick_touch_pad_enabled)
+    
+    # Initialize visualizations after environment interface is established
+    initialize_visualizations()
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
@@ -152,3 +157,11 @@ func update_joystick_touch_pad(enable : bool) -> void:
         
         $objects/joystick_touch_pad.visible = true
         $objects/joystick_touch_pad/head/Camera3D.current = true
+
+func initialize_visualizations() -> void:
+    visualizations_scene = get_node_or_null("visualizations")
+    
+    if visualizations_scene:
+        visualizations_scene.show_window("left")
+        visualizations_scene.show_window("right")
+        visualizations_scene.show_window("top")
