@@ -8,8 +8,9 @@
 shader_type spatial;
 render_mode unshaded;
 
-uniform float speed : hint_range(0.1, 2.0) = 0.36;
 uniform vec2 resolution = vec2(1024.0, 1024.0);
+uniform float render_speed : hint_range(0.1, 2.0) = 0.36;
+uniform float rain_speed : hint_range(0.1, 10.0) = 1.0;
 
 // Character definitions
 const vec2 ch0 = vec2(935221.0,731292.0);
@@ -52,6 +53,8 @@ const vec2 ch_Z = vec2(1968194.0,133180.0);  //const vec2 ch_z = vec2(480.0,1148
 
 const vec2 ch_dot  = vec2(0.0,1560.0);
 const vec2 ch_dash = vec2(7.0,1572864.0);
+const vec2 ch_colon = vec2(195.0,1560.0);
+const vec2 ch_space = vec2(0.0,0.0); // defined but not displayed
 
 const vec2 DS = vec2(6.0,7.0); // digital size
 const float LX = 8.0; // letter space x
@@ -82,7 +85,7 @@ float sprite(vec2 spr, vec2 p) {
 }
 
 vec2 getD(float d) {
-    float index = floor(clamp(d, 0.0, 37.0));
+    float index = floor(clamp(d, 0.0, 39.0));
 
     if(index == 0.0) return ch0;
     if(index == 1.0) return ch1;
@@ -122,6 +125,9 @@ vec2 getD(float d) {
     if(index == 35.0) return ch_Z;
     if(index == 36.0) return ch_dot;
     if(index == 37.0) return ch_dash;
+    if(index == 38.0) return ch_colon;
+    if(index == 39.0) return ch_space;
+    if(index == 40.0) return ch_space; // not be displayed due to floor clamped at 39.0
     return vec2(0.0, 0.0);
 }
 
@@ -131,11 +137,11 @@ float rain(vec2 p) {
     pos.x -= mod(pos.x, LX);
 
     float offset = sin(pos.x * LX);
-    float rain_speed = abs(cos(pos.x * 2.0)) * 0.12 + 0.08;
+    float column_speed = abs(cos(pos.x * 2.0)) * 0.12 + 0.08;
 
     // Here we use the Y coordinate from the top.
     float normalizedY = (resolution.y - p.y) / resolution.y;
-    float timeOffset = TIME * rain_speed;
+    float timeOffset = TIME * column_speed * rain_speed;
 
     // When TIME increases, the fract value cycles so that rain appears to fall downward.
     float yPos = fract(normalizedY + timeOffset + offset);
@@ -155,8 +161,8 @@ void fragment() {
     vec2 suv = mod(uv, grid) / grid;
     vec2 block = floor(uv / grid);
 
-    float time_offset = rand(block) + TIME * speed;
-    float char_index = mod(time_offset * 10.0, 37.0);
+    float time_offset = rand(block) + TIME * render_speed;
+    float char_index = mod(time_offset * 10.0, 39.0);
 
     vec2 char_data = getD(char_index);
     float sprite_value = sprite(char_data, uv);
