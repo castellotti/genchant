@@ -162,12 +162,14 @@ func initialize_visualizations() -> void:
     
     if visualizations_scene:
         visualizations_scene.show_visualization("sphere")
+        visualizations_scene.show_visualization("bar_chart")
 
         # The following visualizations entirely depend on shaders
         if not Globals.is_running_in_visionos:
             # Godot Vision does not currently support shaders
+            visualizations_scene.show_visualization("matrix")
+            visualizations_scene.show_visualization("domain")
+
             visualizations_scene.show_visualization("left")
             visualizations_scene.show_visualization("right")
             #visualizations_scene.show_visualization("top")
-            visualizations_scene.show_visualization("matrix")
-            visualizations_scene.show_visualization("domain")
