@@ -110,12 +110,12 @@ func create_domain_windows() -> void:
     # Reset domain counts after displaying
     domain_counts.clear()
 
-func calculate_frequencies(domain_counts):
+func calculate_frequencies(counts):
     var total_requests = 0
     var max_count = 0
     
     # Calculate total requests and find the maximum count
-    for count in domain_counts.values():
+    for count in counts.values():
         total_requests += count
         if count > max_count:
             max_count = count
@@ -128,8 +128,8 @@ func calculate_frequencies(domain_counts):
     
     var frequencies = {}
     
-    for domain in domain_counts.keys():
-        var count = domain_counts[domain]
+    for domain in counts.keys():
+        var count = counts[domain]
         var normalized_freq = (count / float(max_count)) * (max_frequency - min_frequency) + min_frequency
         frequencies[domain] = normalized_freq
     

@@ -17,7 +17,7 @@ func setup_window() -> void:
 
     var plane := PlaneMesh.new()
     plane.size = window_size
-    plane.orientation = 2  # Face Z
+    plane.orientation = PlaneMesh.Orientation.FACE_Z
     mesh_instance.mesh = plane
 
     # Load shader if not provided by subclass

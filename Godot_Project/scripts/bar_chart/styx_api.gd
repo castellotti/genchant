@@ -14,11 +14,6 @@ var udp_client: PacketPeerUDP = PacketPeerUDP.new()
 var packet_fragments := {}
 var expected_fragments := {}
 
-# Define server settings
-var server_ip: String = "172.16.100.1"
-var server_port_tcp: int = 443
-var server_port_udp: int = 8192
-
 # Endpoints
 var endpoints: Dictionary = {
     "remote": {
@@ -70,7 +65,7 @@ func send_request() -> void:
         var json_str: String = JSON.stringify(json_data)
 
         # Send request via UDP
-        udp_client.connect_to_host(server_ip, server_port_udp)
+        udp_client.connect_to_host(Globals.server_ip, Globals.server_port_udp)
         var packet: PackedByteArray = json_str.to_utf8_buffer()
         var sent: int = udp_client.put_packet(packet)
         if sent == OK:
@@ -80,7 +75,7 @@ func send_request() -> void:
     else:
         var status = http_client.get_http_client_status()
         if status == HTTPClient.STATUS_DISCONNECTED:
-            var url = "https://%s:%d%s" % [server_ip, server_port_tcp, endpoint_data.api_path]
+            var url = "https://%s:%d%s" % [Globals.server_ip, Globals.server_port_tcp, endpoint_data.api_path]
             print("Connecting to URL: ", url)
             var error = http_client.request(url, [], HTTPClient.METHOD_GET)
             if error != OK:

@@ -2,7 +2,6 @@ extends Node3D
 
 var interface_alerts : bool = false
 var passthrough_enabled : bool = false
-var visualizations_scene : Node3D
 var xr_interface : XRInterface
 
 func _ready():
@@ -159,9 +158,16 @@ func update_joystick_touch_pad(enable : bool) -> void:
         $objects/joystick_touch_pad/head/Camera3D.current = true
 
 func initialize_visualizations() -> void:
-    visualizations_scene = get_node_or_null("visualizations")
+    var visualizations_scene = get_node_or_null("visualizations")
     
     if visualizations_scene:
-        visualizations_scene.show_window("left")
-        visualizations_scene.show_window("right")
-        visualizations_scene.show_window("top")
+        visualizations_scene.show_visualization("sphere")
+
+        # The following visualizations entirely depend on shaders
+        if not Globals.is_running_in_visionos:
+            # Godot Vision does not currently support shaders
+            visualizations_scene.show_visualization("left")
+            visualizations_scene.show_visualization("right")
+            #visualizations_scene.show_visualization("top")
+            visualizations_scene.show_visualization("matrix")
+            visualizations_scene.show_visualization("domain")
