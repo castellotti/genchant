@@ -2,10 +2,10 @@ extends VisualizationWindow
 class_name MatrixWindow
 
 func _ready() -> void:
-    window_position = Vector3(0, 1, 6.5)  # Move forward
+    window_position = Vector3(0, 1.5, 6.5)  # Move forward
     window_size = Vector2(5, 5)
 
-    shader_path = "res://assets/shaders/digital_matrix_rain.gdshader"
+    shader_path = "res://shaders/digital_matrix_rain.gdshader"
 
     shader_parameters = {
         "resolution": Vector2(1024, 1024),

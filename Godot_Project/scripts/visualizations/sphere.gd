@@ -17,7 +17,7 @@ func _ready() -> void:
         sphere.material = material
     else:
         # Use a shader material
-        shader_material.shader = load("res://assets/shaders/rgb.gdshader")
+        shader_material.shader = load("res://shaders/rgb.gdshader")
         shader_material.set_shader_parameter("speed", 0.5)
         shader_material.set_shader_parameter("linger", 4.0)
         sphere.material = shader_material
