@@ -14,7 +14,7 @@ func _init(column_color: Array = [1, 1, 1], label_content: String = "", label_sh
 
     if use_glow_shader:
         # Attempt to load the glow shader
-        var glow_shader = load("res://assets/shaders/cube_mesh_glow_outline.gdshader")
+        var glow_shader = load("res://shaders/cube_mesh_glow_outline.gdshader")
         if glow_shader and glow_shader is Shader:
             # Create a ShaderMaterial from the glow shader
             var shader_material = ShaderMaterial.new()

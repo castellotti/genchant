@@ -126,8 +126,7 @@ vec2 getD(float d) {
     if(index == 36.0) return ch_dot;
     if(index == 37.0) return ch_dash;
     if(index == 38.0) return ch_colon;
-    if(index == 39.0) return ch_space;
-    if(index == 40.0) return ch_space; // not be displayed due to floor clamped at 39.0
+    if(index == 39.0) return ch_space; // not displayed due to floor clamped at 39.0
     return vec2(0.0, 0.0);
 }
 

@@ -50,6 +50,7 @@ var character_table: Dictionary = {
     ".": 36.0,
     "-": 37.0,
     ":": 38.0,
+    " ": 39.0
 }
 
 func _ready() -> void:
