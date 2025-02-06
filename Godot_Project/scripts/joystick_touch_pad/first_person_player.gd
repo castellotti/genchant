@@ -39,10 +39,10 @@ func look(look_vector):
 func _physics_process(delta):
     
     # Check if character has fallen through the floor
-    if global_transform.origin.y < 0:
-        print("Character fell through the floor! Resetting position.")
-        global_transform.origin.y = 0
+    if global_transform.origin.y != 0 and global_transform.origin.y < 0.0005:
+        print("Character at or below floor level. Resetting position.")
         velocity = Vector3.ZERO  # Reset velocity to prevent falling again
+        global_transform.origin.y = 0
     
     # Handle camera control with Input Map actions
     var camera_look = Vector2.ZERO
@@ -68,7 +68,7 @@ func _physics_process(delta):
         jump_just_pressed = false
         velocity.y = JUMP_VELOCITY
 
-    # 1) On-screen joystick input
+    # On-screen joystick input
     var input_dir = joystick_touch_pad.get_joystick()
 
     # Keyboard and Input map controls:

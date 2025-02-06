@@ -3,6 +3,7 @@ extends MeshInstance3D
 var color: Array = [1, 1, 1]  # Default white
 var label_enabled: bool = false  # Default: no label
 var x_width_and_z_depth: float = 0.1
+var domain_label: Label3D = null
 
 # Toggle whether to use the glow shader. (True by default but not supported in visionOS)
 var use_glow_shader: bool = not Globals.is_running_in_visionos
@@ -95,14 +96,17 @@ func _input_event(_viewport, event, _shape_idx):
         display_domain_name()
 
 func display_domain_name():
-    var label = Label3D.new()
-    label.text = name
-    label.transform.basis = Basis(Vector3(0, 1, 0), -PI / 2)
+    if domain_label:
+        domain_label.queue_free()
+
+    domain_label = Label3D.new()
+    domain_label.text = name
+    domain_label.transform.basis = Basis(Vector3(0, 1, 0), -PI / 2)
     var column_height: float = 0.0
     if material_override is ShaderMaterial:
         var shader_material = material_override as ShaderMaterial
         column_height = shader_material.get_shader_parameter("scale").y
     else:
         column_height = (mesh as BoxMesh).size.y
-    label.transform.origin = transform.origin + Vector3(-1.2, column_height, -7)
-    add_child(label)
+    domain_label.transform.origin = transform.origin + Vector3(-1.2, column_height, -7)
+    add_child(domain_label)
