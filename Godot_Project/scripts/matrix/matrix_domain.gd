@@ -1,5 +1,5 @@
 extends VisualizationWindow
-class_name DomainWindow
+class_name MatrixDomainWindow
 
 var resolution = Vector2(1024, 1024)
 var render_speed: float = 0.36

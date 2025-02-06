@@ -3,19 +3,19 @@ extends Node3D
 var visualizations: Dictionary = {}
 var animation_duration = 0.5
 
-# Mapping of scene labels to their paths
-var visualization_scenes = {
-    "bar_chart": "res://scenes/bar_chart/bar_chart.tscn"
-}
+# Mapping of scenes-based visualizations to their paths
+var visualization_scenes = {}
 
 # Mapping of script-based visualizations
 var visualization_classes = {
+    "bar_chart_raw": BarChartRawVisualization,
+    "bar_chart_remote": BarChartRemoteVisualization,
+    "matrix_background": MatrixBackgroundWindow,
+    "matrix_domain": MatrixDomainWindow,
     "sphere": SphereVisualization,
-    "matrix": MatrixWindow,
-    "domain": DomainWindow,
     "left": LeftWindow,
     "right": RightWindow,
-    "top": TopWindow
+    "top": TopWindow,
 }
 
 func show_visualization(label: String) -> void:

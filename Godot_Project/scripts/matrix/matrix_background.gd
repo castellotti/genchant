@@ -1,5 +1,5 @@
 extends VisualizationWindow
-class_name MatrixWindow
+class_name MatrixBackgroundWindow
 
 func _ready() -> void:
     window_position = Vector3(0, 1.5, 6.5)  # Move forward

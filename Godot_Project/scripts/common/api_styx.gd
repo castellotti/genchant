@@ -2,8 +2,6 @@ extends Node
 
 class_name StyxApi
 
-var is_running_in_web : bool = OS.get_name() == "Web" or OS.get_name() == "HTML5"
-
 # Load the network visualization script
 var network_visualization = preload("res://scripts/bar_chart/network_visualization.gd")
 var nv = null
@@ -42,7 +40,7 @@ func init(endpoint: String) -> void:
 
 # Ensure the node is fully initialized and added to the scene tree before making the network requests
 func _ready():
-    if not is_running_in_web:
+    if not Globals.is_running_in_web:
         # Create and bind the UDP client to any available port
         var bind_result: int = udp_client.bind(0)
         if bind_result != OK:
@@ -60,7 +58,7 @@ func send_request() -> void:
         print("Endpoint not found:", current_endpoint)
         return
 
-    if not is_running_in_web:
+    if not Globals.is_running_in_web:
         var json_data: Dictionary = {"GET": endpoint_data.api_path}
         var json_str: String = JSON.stringify(json_data)
 
@@ -84,7 +82,7 @@ func send_request() -> void:
             print("Delaying HTTP request, status: ", status)
 
 func _process(_delta):
-    if not is_running_in_web:
+    if not Globals.is_running_in_web:
         receive_udp_response()
 
 func receive_udp_response():
