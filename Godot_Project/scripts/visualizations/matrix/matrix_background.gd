@@ -2,7 +2,7 @@ extends VisualizationWindow
 class_name MatrixBackgroundWindow
 
 func _ready() -> void:
-    window_position = Vector3(0, 1.5, 6.5)  # Move forward
+    window_position = Vector3(0, Globals.EYE_HEIGHT, 6)  # Move forward
     window_size = Vector2(5, 5)
 
     shader_path = "res://shaders/matrix/matrix_background.gdshader"

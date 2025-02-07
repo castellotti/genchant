@@ -6,7 +6,7 @@ albedo_color = Color(0.501961, 0, 0.501961, 1)
 [node name="TorusNode3D" type="Node3D"]
 
 [node name="CSGTorus3D" type="CSGTorus3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866025, 0, 0.866025, 0.5, 0, 1.75, 0)
 inner_radius = 1.0
 outer_radius = 2.0
 sides = 64

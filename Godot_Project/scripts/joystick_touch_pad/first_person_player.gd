@@ -6,6 +6,8 @@ extends CharacterBody3D
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
+var MIN_HEIGHT = 0.0005  # Adjust to "main" scene's floor level
+var MAX_HEIGHT = 20  # Ceiling limit
 const LOOK_SENS = 2.0
 const CAMERA_LOOK_SPEED = SPEED  # Match to position movement speed
 
@@ -13,8 +15,11 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var initial_position: Vector3  # Store player's original position
 var jump_just_pressed = false
 
+var visualizations_scene = null  # TODO
+
 func _ready():
     initial_position = global_transform.origin  # Store initial position
+    visualizations_scene = get_node_or_null("../../visualizations")  # TODO
 
 func reset_position():
     print("Resetting player to initial position:", initial_position)
@@ -38,12 +43,6 @@ func look(look_vector):
 
 func _physics_process(delta):
     
-    # Check if character has fallen through the floor
-    if global_transform.origin.y != 0 and global_transform.origin.y < 0.0005:
-        print("Character at or below floor level. Resetting position.")
-        velocity = Vector3.ZERO  # Reset velocity to prevent falling again
-        global_transform.origin.y = 0
-    
     # Handle camera control with Input Map actions
     var camera_look = Vector2.ZERO
     if Input.is_action_pressed("camera_left"):
@@ -56,12 +55,26 @@ func _physics_process(delta):
         camera_look.y -= CAMERA_LOOK_SPEED    
     look(camera_look)
     
+    # Raise and lower perspective
+    if Input.is_action_pressed("page_up"):
+        head.position.y += CAMERA_LOOK_SPEED * delta
+    if Input.is_action_pressed("page_down"):
+        head.position.y -= CAMERA_LOOK_SPEED * delta
+        
     # Handle looking around with joystick
     look(-joystick_touch_pad.get_touchpad_delta())
     
-    # Apply gravity if not on the floor
-    if not on_floor():
+    # Apply gravity if not on the floor and movement isn't overriding it
+    if not is_on_floor(): # is_on_floor() not returning correct value
         velocity.y -= gravity * delta
+
+    # Prevent floating too high or sinking too low
+    if global_position.y < Globals.MIN_HEIGHT:
+        global_position.y = 0
+        velocity.y = 0  # Stop downward movement
+    elif global_position.y > Globals.MAX_HEIGHT:
+        global_position.y = Globals.MAX_HEIGHT
+        velocity.y = 0  # Stop upward movement
     
     # Jump input
     if jump_just_pressed and on_floor():
@@ -108,3 +121,11 @@ func _physics_process(delta):
 
 func on_jump_button_pressed():
     jump_just_pressed = true
+    
+    if visualizations_scene:
+        visualizations_scene.toggle_visualization("matrix_background")
+        visualizations_scene.toggle_visualization("matrix_domain")
+        #visualizations_scene.toggle_visualization("sphere")
+        #visualizations_scene.toggle_visualization("cube")
+        #visualizations_scene.toggle_visualization("bar_chart_raw")
+        #visualizations_scene.toggle_visualization("bar_chart_remote")
