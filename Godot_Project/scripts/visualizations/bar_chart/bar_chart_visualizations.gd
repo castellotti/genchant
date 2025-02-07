@@ -1,4 +1,3 @@
-# BarChartVisualization.gd
 extends Node3D
 class_name BarChartVisualization
 

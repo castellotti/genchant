@@ -56,7 +56,7 @@ var character_table: Dictionary = {
 func _ready() -> void:
     window_position = Vector3(0, 1.5, 6.5)
     window_size = Vector2(5, 5)
-    shader_path = "res://shaders/domain_matrix_rain.gdshader"
+    shader_path = "res://shaders/matrix/matrix_domain.gdshader"
 
     domain_counts = get_domains()
 

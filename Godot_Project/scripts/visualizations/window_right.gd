@@ -6,7 +6,7 @@ func _ready() -> void:
     window_rotation = Vector3(0, -45, 0)    # Rotate left
     window_size = Vector2(2, 2)
 
-    shader_path = "res://shaders/matrix_hologram.gdshader"
+    shader_path = "res://shaders/matrix/matrix_hologram.gdshader"
     texture_path = "res://assets/textures/matrix_hologram.png"
     shader_parameters = {
         "x_scale": 10.0,

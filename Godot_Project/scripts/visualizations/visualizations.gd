@@ -114,13 +114,13 @@ func _enable_processing(node: Node) -> void:
     for child in node.get_children():
         _enable_processing(child)
 
-func _animate_visualization(node: Node3D, set_visible: bool) -> void:
+func _animate_visualization(node: Node3D, make_visible: bool) -> void:
     var tween = get_tree().create_tween()
     tween.set_parallel(true)  # Run all tweens in parallel
     
     var mesh_instances = _find_all_mesh_instances(node)
 
-    if set_visible:
+    if make_visible:
         node.show()
         node.set_process(true)
         tween.tween_property(node, "scale", Vector3(1, 1, 1), animation_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -136,11 +136,11 @@ func _animate_visualization(node: Node3D, set_visible: bool) -> void:
     # Wait until the tween finishes before hiding
     await tween.finished
 
-    if not set_visible:
+    if not make_visible:
         print("Hiding visualization node: ", node.name)
         node.hide()
 
-    _set_node_and_children_processing(node, set_visible)
+    _set_node_and_children_processing(node, make_visible)
 
 # Animate material transparency by modifying the albedo color's alpha channel
 func _animate_material_alpha(tween: Tween, mesh_instance: MeshInstance3D, target_alpha: float) -> void:

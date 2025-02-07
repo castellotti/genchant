@@ -6,7 +6,7 @@ func _ready() -> void:
     window_rotation = Vector3(30, 0, 0) # Rotate down
     window_size = Vector2(5, 5)
 
-    shader_path = "res://shaders/digital_matrix_rain.gdshader"
+    shader_path = "res://shaders/matrix/matrix_background.gdshader"
 
     shader_parameters = {
         "resolution": Vector2(1024, 1024),
