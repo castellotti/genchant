@@ -11,28 +11,14 @@ var is_initialized: bool = false  # Prevents duplicate initialization
 var udp_client: PacketPeerUDP = PacketPeerUDP.new()
 var packet_fragments := {}
 
-# Endpoints
-var endpoints: Dictionary = {
-    "remote": {
-        "api_path": "/api/v1/remote?relative=1h",
-        "color": [0, 0, 1], # blue
-        "transform": [0, 0, -1],
-        "label": true },
-    "raw": {
-        "api_path": "/api/v1/raw?relative=10s",
-        "color": [1, 0, 0], # red
-        "transform": [0, 0, 0],
-        "label": false }
-}
-
-var current_endpoint: String = ""
+var api_endpoint: String = ""
 
 # Initialize styx_api with a specific endpoint
-func init(endpoint: String) -> void:
+func init(api_path: String) -> void:
     if is_initialized:
         return
     is_initialized = true
-    current_endpoint = endpoint
+    api_endpoint = api_path
 
 func _ready():
     if not Globals.is_running_in_web:
@@ -44,18 +30,12 @@ func _ready():
     else:
         # Add HTTPRequest to the scene tree and connect signal
         add_child(http_client)
-        # Connect the request_completed signal
         http_client.connect("request_completed", self._process_response_http)
         send_request()
 
 func send_request() -> void:
-    var endpoint_data = endpoints.get(current_endpoint)
-    if endpoint_data == null:
-        print("Endpoint not found: ", current_endpoint)
-        return
-
     if not Globals.is_running_in_web:
-        var json_data: Dictionary = {"GET": endpoint_data.api_path}
+        var json_data: Dictionary = {"GET": api_endpoint}
         var json_str: String = JSON.stringify(json_data)
 
         # Send request via UDP
@@ -69,7 +49,7 @@ func send_request() -> void:
     else:
         var status = http_client.get_http_client_status()
         if status == HTTPClient.STATUS_DISCONNECTED:
-            var url = "https://%s:%d%s" % [Globals.server_ip, Globals.server_port_tcp, endpoint_data.api_path]
+            var url = "https://%s:%d%s" % [Globals.server_ip, Globals.server_port_tcp, api_endpoint]
             print("Connecting to URL: ", url)
             var error = http_client.request(url, [], HTTPClient.METHOD_GET)
             if error != OK:
@@ -138,7 +118,7 @@ func process_data(body: String) -> void:
         var parsed_data = json.get_data()
         if parsed_data.size() > 0:
             # Emit the data_received signal with the current endpoint and parsed data.
-            emit_signal("data_received", current_endpoint, parsed_data)
+            emit_signal("data_received", api_endpoint, parsed_data)
         else:
             print("No data found in JSON response")
     else:

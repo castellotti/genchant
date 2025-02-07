@@ -4,7 +4,9 @@ var visualizations: Dictionary = {}
 var animation_duration = 0.5
 
 # Mapping of scenes-based visualizations to their paths
-var visualization_scenes = {}
+var visualization_scenes = {
+    "cube": "res://scenes/cube/cube.tscn",
+}
 
 # Mapping of script-based visualizations
 var visualization_classes = {
@@ -58,11 +60,17 @@ func hide_visualization(label: String, remove: bool = false) -> void:
 func create_visualization_from_script(label: String, visualization_class) -> void:
     var instance = visualization_class.new()
     if instance is Node3D:
-        # Hide until animation is called
-        instance.hide()
+        instance.scale = Vector3(0.1, 0.1, 0.1)  # Start small
+        instance.hide()  # Hide until animation is called
         _disable_processing(instance)
         add_child(instance)
         visualizations[label] = instance
+        
+        # Wait until the node is fully added before animating
+        await get_tree().process_frame
+        
+        # Animate into view
+        _animate_visualization(instance, true)
     else:
         print("Error: Visualization '%s' is not a valid Node3D" % label)
 
@@ -72,11 +80,17 @@ func create_visualization_from_scene(label: String, scene_path: String) -> void:
     if scene:
         var instance = scene.instantiate()
         if instance is Node3D:
-            # Hide until animation is called
-            instance.hide()
+            instance.scale = Vector3(0.1, 0.1, 0.1)  # Start small
+            instance.hide()  # Hide until animation is called
             _disable_processing(instance)
             add_child(instance)
             visualizations[label] = instance
+
+            # Wait for a frame to ensure it's added before animating
+            await get_tree().process_frame
+            
+            # Animate into view
+            _animate_visualization(instance, true)
         else:
             print("Error: Scene '%s' does not instantiate a valid Node3D" % scene_path)
     else:
@@ -100,13 +114,13 @@ func _enable_processing(node: Node) -> void:
     for child in node.get_children():
         _enable_processing(child)
 
-func _animate_visualization(node: Node3D, set_visibile: bool) -> void:
+func _animate_visualization(node: Node3D, set_visible: bool) -> void:
     var tween = get_tree().create_tween()
-
-    # Find all MeshInstance3D nodes in the hierarchy
+    tween.set_parallel(true)  # Run all tweens in parallel
+    
     var mesh_instances = _find_all_mesh_instances(node)
 
-    if set_visibile:
+    if set_visible:
         node.show()
         node.set_process(true)
         tween.tween_property(node, "scale", Vector3(1, 1, 1), animation_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -119,13 +133,14 @@ func _animate_visualization(node: Node3D, set_visibile: bool) -> void:
         for mesh in mesh_instances:
             _animate_material_alpha(tween, mesh, 0.0)
 
-    # After animation, fully disable processing and hide
-    tween.tween_callback(func():
-        if not set_visibile:
-            print("Hiding visualization node: ", node.name)
-            node.hide()
-        _set_node_and_children_processing(node, set_visibile)
-    )
+    # Wait until the tween finishes before hiding
+    await tween.finished
+
+    if not set_visible:
+        print("Hiding visualization node: ", node.name)
+        node.hide()
+
+    _set_node_and_children_processing(node, set_visible)
 
 # Animate material transparency by modifying the albedo color's alpha channel
 func _animate_material_alpha(tween: Tween, mesh_instance: MeshInstance3D, target_alpha: float) -> void:

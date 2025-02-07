@@ -4,9 +4,16 @@ class_name BarChartRawVisualization
 var update_timer: Timer
 
 const REFRESH_INTERVAL = 2.0
+const CONFIG = {
+    # Provides raw network traffic data with timestamps
+    "api_path": "/api/v1/raw?relative=10s",
+    "color": [1, 0, 0],   # Red
+    "transform": [0, 0, 0],
+    "label": false
+}
 
 func _ready() -> void:
-    initialize("raw")
+    initialize(CONFIG)
     
     # Create a timer for periodic updates
     update_timer = Timer.new()

@@ -4,19 +4,22 @@ class_name BarChartVisualization
 
 var styx_api: StyxApi
 var columns_node: Node3D
+var configuration: Dictionary
 
-func initialize(endpoint: String) -> void:
+func initialize(config: Dictionary) -> void:
+    configuration = config
+    
     # Create and initialize the API
     styx_api = StyxApi.new()
-    styx_api.init(endpoint)
+    styx_api.init(configuration["api_path"])
     
-    # Listen for data; when received, our _on_data_received() will be called.
+    # Listen for data; when received, _on_data_received() will be called.
     if not styx_api.is_connected("data_received", Callable(self, "_on_data_received")):
         styx_api.connect("data_received", Callable(self, "_on_data_received"))
         
     add_child(styx_api)
     
-    # Create a container for our columns.
+    # Create a container for columns
     columns_node = Node3D.new()
     columns_node.name = "ColumnsNode"
     add_child(columns_node)
@@ -64,7 +67,6 @@ func update_columns(traffic_data: Dictionary) -> void:
         return
     
     # Retrieve endpoint-specific settings (color, transform, label) from the API’s endpoints dictionary.
-    var endpoint_data: Dictionary = get_endpoint_data()
     var max_traffic: int = 0
     for traffic in traffic_data.values():
         if traffic > max_traffic:
@@ -80,20 +82,20 @@ func update_columns(traffic_data: Dictionary) -> void:
         if column_scene == null:
             print("Error: Could not load column.gd")
             return
-        var column = column_scene.new(endpoint_data["color"], address, endpoint_data["label"])
+        var column = column_scene.new(configuration["color"], address, configuration["label"])
         
         # Set the column’s size (its y‑scale is determined by the data)
         column.scale = Vector3(1, height_ratio * 5.0, 1)
         # Position the column; here we space them along the x‑axis and adjust the y‑position so they “grow” from the base.
         column.transform.origin = Vector3(index * 0.2, (height_ratio * 2.5), 6)
         # Apply any additional translation from the endpoint settings.
-        column.translate(Vector3(endpoint_data["transform"][0], endpoint_data["transform"][1], endpoint_data["transform"][2]))
+        column.translate(Vector3(
+            configuration["transform"][0],
+            configuration["transform"][1],
+            configuration["transform"][2])
+        )
         columns_node.add_child(column)
         index += 1
-
-func get_endpoint_data() -> Dictionary:
-    # Return the configuration for the current endpoint from the API.
-    return styx_api.endpoints.get(styx_api.current_endpoint, {})
 
 func cleanup() -> void:
     # Called when the visualization is hidden or removed.
