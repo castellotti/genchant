@@ -1,30 +1,25 @@
 extends Node
-
 class_name StyxApi
 
-# Load the network visualization script
-var network_visualization = preload("res://scripts/bar_chart/network_visualization.gd")
-var nv = null
+# This line will generate the following debugger warning, please ignore:
+# The signal "data_received" is declared but never explicitly used in the cslass.
+signal data_received(endpoint: String, data: Array)
 
 # Network client setup (UDP for native clients, TCP HTTPRequest for WebXR web export)
 var http_client: HTTPRequest = HTTPRequest.new()
+var is_initialized: bool = false  # Prevents duplicate initialization
 var udp_client: PacketPeerUDP = PacketPeerUDP.new()
 var packet_fragments := {}
-var expected_fragments := {}
 
 # Endpoints
 var endpoints: Dictionary = {
     "remote": {
         "api_path": "/api/v1/remote?relative=1h",
-        "calculate": "calculate_traffic_remote",
-        "visualize": "visualize_data_remote",
         "color": [0, 0, 1], # blue
         "transform": [0, 0, -1],
         "label": true },
     "raw": {
         "api_path": "/api/v1/raw?relative=10s",
-        "calculate": "calculate_traffic_raw",
-        "visualize": "visualize_data_raw",
         "color": [1, 0, 0], # red
         "transform": [0, 0, 0],
         "label": false }
@@ -34,19 +29,20 @@ var current_endpoint: String = ""
 
 # Initialize styx_api with a specific endpoint
 func init(endpoint: String) -> void:
+    if is_initialized:
+        return
+    is_initialized = true
     current_endpoint = endpoint
-    nv = network_visualization.new()
-    add_child(nv)
 
-# Ensure the node is fully initialized and added to the scene tree before making the network requests
 func _ready():
     if not Globals.is_running_in_web:
         # Create and bind the UDP client to any available port
-        var bind_result: int = udp_client.bind(0)
-        if bind_result != OK:
-            print("Failed to bind UDP client")
+        if udp_client and not udp_client.is_bound():  # Ensure it's not already bound
+            var bind_result: int = udp_client.bind(0)
+            if bind_result != OK:
+                print("Failed to bind UDP client, error code: ", bind_result)
     else:
-        # Add HTTPRequest to the scene tree
+        # Add HTTPRequest to the scene tree and connect signal
         add_child(http_client)
         # Connect the request_completed signal
         http_client.connect("request_completed", self._process_response_http)
@@ -55,7 +51,7 @@ func _ready():
 func send_request() -> void:
     var endpoint_data = endpoints.get(current_endpoint)
     if endpoint_data == null:
-        print("Endpoint not found:", current_endpoint)
+        print("Endpoint not found: ", current_endpoint)
         return
 
     if not Globals.is_running_in_web:
@@ -81,17 +77,17 @@ func send_request() -> void:
         else:
             print("Delaying HTTP request, status: ", status)
 
-func _process(_delta):
+func _process(_delta: float) -> void:
     if not Globals.is_running_in_web:
         receive_udp_response()
 
-func receive_udp_response():
+func receive_udp_response() -> void:
     while udp_client.get_available_packet_count():
         var packet: PackedByteArray = udp_client.get_packet()
         var response: String = packet.get_string_from_utf8()
         process_response_udp(response)
 
-func process_response_udp(response: String):
+func process_response_udp(response: String) -> void:
     # Parse the fragment
     var delimiter_index: int = response.find(":")
     if delimiter_index == -1:
@@ -114,7 +110,7 @@ func process_response_udp(response: String):
     if !packet_fragments.has(fragment_num):
         packet_fragments[fragment_num] = body
 
-    # Check if all fragments have been received
+    # Once all fragments have been received, process the complete response.
     if packet_fragments.size() == total_fragments:
         var complete_response: String = ""
         for i in range(1, total_fragments + 1):
@@ -126,7 +122,7 @@ func process_response_udp(response: String):
         # Clear stored fragments for the next message
         packet_fragments.clear()
 
-func _process_response_http(_result, response_code, _headers, body):
+func _process_response_http(_result, response_code: int, _headers, body: PackedByteArray) -> void:
     if response_code == 200:
         var response: String = body.get_string_from_utf8()
         process_data(response)
@@ -134,38 +130,16 @@ func _process_response_http(_result, response_code, _headers, body):
         print("HTTP request failed with response code: ", response_code)
 
 # Process the data returned by the call to the API
-func process_data(body):
+func process_data(body: String) -> void:
     var json = JSON.new()
     var json_result = json.parse(body)
 
     if json_result == OK:
         var parsed_data = json.get_data()
         if parsed_data.size() > 0:
-            # Call the appropriate method for traffic calculation and visualization
-            var endpoint_data = endpoints.get(current_endpoint)
-            if endpoint_data != null:
-                var calculate_method = endpoint_data.calculate
-                var visualize_method = endpoint_data.visualize
-
-                var data: Dictionary = call(calculate_method, parsed_data)
-                call(visualize_method, data)
-            else:
-                print("Endpoint configuration not found for", current_endpoint)
+            # Emit the data_received signal with the current endpoint and parsed data.
+            emit_signal("data_received", current_endpoint, parsed_data)
         else:
-            print("No data found in the JSON response")
+            print("No data found in JSON response")
     else:
         print("Failed to parse JSON: ", body)
-
-func calculate_traffic_remote(parsed_data: Array) -> Dictionary:
-    return nv.calculate_traffic_remote(parsed_data)
-
-func calculate_traffic_raw(parsed_data: Array) -> Dictionary:
-    return nv.calculate_traffic_raw(parsed_data)
-
-func visualize_data_remote(data: Dictionary) -> void:
-    print("Visualizing remote data: ", data)
-    nv.visualize_data_remote(endpoints.get(current_endpoint), data)
-
-func visualize_data_raw(data: Dictionary) -> void:
-    print("Visualizing raw data: ", data)
-    nv.visualize_data_raw(endpoints.get(current_endpoint), data)

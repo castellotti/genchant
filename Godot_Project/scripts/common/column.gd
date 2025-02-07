@@ -1,3 +1,4 @@
+# column.gd
 extends MeshInstance3D
 
 var color: Array = [1, 1, 1]  # Default white
@@ -17,19 +18,16 @@ func _init(column_color: Array = [1, 1, 1], label_content: String = "", label_sh
         # Attempt to load the glow shader
         var glow_shader = load("res://shaders/cube_mesh_glow_outline.gdshader")
         if glow_shader and glow_shader is Shader:
-            # Create a ShaderMaterial from the glow shader
             var shader_material = ShaderMaterial.new()
             shader_material.shader = glow_shader
-            # Preserve the color.
+            # Preserve the color. (Other uniforms such as width, sharpness, glow will use the defaults from the shader)
             shader_material.set_shader_parameter("color", Color(color[0], color[1], color[2]))
-            # (Other uniforms such as width, sharpness, glow will use the defaults from the shader)
-
-            # Load the PNG texture and assign it
+            
             var tex = load("res://assets/textures/cube_mesh_glow_outline.png")
             if tex is Texture2D:
                 shader_material.set_shader_parameter("tex", tex)
 
-            # Create a BoxMesh of size (1,1,1) as required by the shader
+            # BoxMesh of size (1,1,1) is required by the shader
             var box_mesh = BoxMesh.new()
             box_mesh.size = Vector3.ONE
             # Set a default custom AABB (this will be updated in _ready() based on the final scale)
@@ -38,13 +36,10 @@ func _init(column_color: Array = [1, 1, 1], label_content: String = "", label_sh
             mesh = box_mesh
             material_override = shader_material
         else:
-            # If the shader could not be loaded, fall back to the non-shader version.
             use_glow_shader = false
 
     if not use_glow_shader:
-        # Use the standard material and original mesh
         var box_mesh = BoxMesh.new()
-        # (This is the original base size, which will be scaled externally.)
         box_mesh.size = Vector3(x_width_and_z_depth, 1.0, x_width_and_z_depth)
         mesh = box_mesh
 
@@ -57,13 +52,12 @@ func _ready():
     # then reset the node’s scale so that the shader (and our custom AABB) are the only source of scaling
     if material_override is ShaderMaterial:
         var shader_material = material_override as ShaderMaterial
-        # The node’s scale (set externally, for example from network_visualization.gd) becomes the new scale
+        # The node’s scale (set externally) becomes the new scale
         #  shader_material.set_shader_parameter("scale", self.scale)
         var desired_scale = Vector3(x_width_and_z_depth, self.scale.y, x_width_and_z_depth)
         shader_material.set_shader_parameter("scale", desired_scale)
         # Reset the node’s scale so that it remains (1,1,1) in the scene
         self.scale = Vector3.ONE
-
         # Update the custom AABB to match the scaled size
         var half_extents = desired_scale * 0.5
         set_custom_aabb(AABB(-half_extents, desired_scale))
@@ -71,8 +65,6 @@ func _ready():
     # Create a StaticBody3D for input events
     var static_body = StaticBody3D.new()
     add_child(static_body)
-
-    # Create and add a CollisionShape3D
     var collision_shape = CollisionShape3D.new()
     var box_shape = BoxShape3D.new()
     if material_override is ShaderMaterial:
@@ -98,7 +90,6 @@ func _input_event(_viewport, event, _shape_idx):
 func display_domain_name():
     if domain_label:
         domain_label.queue_free()
-
     domain_label = Label3D.new()
     domain_label.text = name
     domain_label.transform.basis = Basis(Vector3(0, 1, 0), -PI / 2)
