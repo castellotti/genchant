@@ -17,7 +17,7 @@ uniform float domain[256];
 uniform int domain_length = 0;
 uniform int domain_column = 0;
 
-// Constants should match values from digital_matrix_rain.gdshader
+// Constants should match values from matrix_background.gdshader
 // (same 6×7 sprite font and 8×10 letter grid)
 const vec2 DS = vec2(6.0, 7.0);
 const float LX = 8.0; // letter space x
@@ -72,7 +72,7 @@ vec2 getD(float d) {
     if (index == 26.0) return vec2(935188.0,698650.0);   // Q
     if (index == 27.0) return vec2(1983767.0,1198242.0); // R
     if (index == 28.0) return vec2(935171.0,1058972.0);  // S
-    if (index == 29.0) return vec2(2035777.0,33288.0);  // T
+    if (index == 29.0) return vec2(2035777.0,33288.0);   // T
     if (index == 30.0) return vec2(1131796.0,665756.0);  // U
     if (index == 31.0) return vec2(1131796.0,664840.0);  // V
     if (index == 32.0) return vec2(1131861.0,699028.0);  // W
@@ -85,7 +85,7 @@ vec2 getD(float d) {
     return vec2(0.0,0.0); // by default return empty space (" ")
 }
 
-// We use the same 8×10 grid as digital_matrix_rain shader. Only the fragments
+// We use the same 8×10 grid as matrix_background shader. Only the fragments
 // in the designated column (i.e. where floor(uv.x/LX)==domain_column) are affected.
 // We “scroll” the text downward by computing a cell–coordinate scroll offset.
 // In each valid cell (i.e. one that corresponds to a character in the domain),
@@ -99,10 +99,9 @@ void fragment() {
     if (floor(uv.x / LX) != float(domain_column)) {
         ALPHA = 0.0;
     } else {
-        // Compute vertical scroll (in “cell” units)
-        float scroll = TIME * rain_speed;
-        // Compute the “text coordinate” (in cells); note that at TIME==0,
-        // the top cell (n==0) will show the last letter of the domain.
+        // Compute vertical scroll
+        float column_offset = float(domain_column) * 0.1; // Introduce a tiny per-column variation
+        float scroll = mod((TIME * rain_speed), float(domain_length) * LY);
         float t = (uv.y / LY) - scroll;
         float n = floor(t);
         if (n < 0.0 || n >= float(domain_length)) {

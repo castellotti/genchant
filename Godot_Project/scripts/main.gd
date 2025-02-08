@@ -1,7 +1,6 @@
 extends Node3D
 
 var interface_alerts : bool = false
-var passthrough_enabled : bool = false
 var xr_interface : XRInterface
 
 func _ready():
@@ -17,7 +16,7 @@ func _ready():
 
             get_viewport().use_xr = true
 
-            passthrough_enabled = enable_passthrough()
+            Globals.passthrough_enabled = enable_passthrough()
         else:
             print("OpenXR not initialized, please check if your headset is connected")
             Globals.joystick_touch_pad_enabled = true
@@ -124,8 +123,8 @@ func _webxr_session_started() -> void:
     $ui/WebCanvasLayer.visible = false
     # This tells Godot to start rendering to the headset.
     get_viewport().use_xr = true
-    
-    passthrough_enabled = enable_passthrough()
+
+    Globals.passthrough_enabled = enable_passthrough()
 
     # This will be the reference space type you ultimately got, out of the
     # types that you requested above. This is useful if you want the game to

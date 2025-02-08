@@ -43,7 +43,7 @@ const vec2 ch_P = vec2(1983767.0,1181728.0); //const vec2 ch_p = vec2(484.0,6674
 const vec2 ch_Q = vec2(935188.0,698650.0);   //const vec2 ch_q = vec2(244.0,665474.0);
 const vec2 ch_R = vec2(1983767.0,1198242.0); //const vec2 ch_r = vec2(354.0,590904.0);
 const vec2 ch_S = vec2(935171.0,1058972.0);  //const vec2 ch_s = vec2(228.0,114844.0);
-const vec2 ch_T = vec2(2035777.0,33288.0);  //const vec2 ch_t = vec2(8674.0,66824.0);
+const vec2 ch_T = vec2(2035777.0,33288.0);   //const vec2 ch_t = vec2(8674.0,66824.0);
 const vec2 ch_U = vec2(1131796.0,665756.0);  //const vec2 ch_u = vec2(292.0,1198868.0);
 const vec2 ch_V = vec2(1131796.0,664840.0);  //const vec2 ch_v = vec2(276.0,664840.0);
 const vec2 ch_W = vec2(1131861.0,699028.0);  //const vec2 ch_w = vec2(276.0,700308.0);

@@ -1,15 +1,25 @@
 extends VisualizationWindow
 class_name MatrixDomainWindow
 
-# A list of domains to scroll should be retrieved from the API every UPDATE_INTERVAL seconds.
-# Based on the number of domains returned (the maximum usable equal to total_columns),
-# the top domains in order should be grouped into batches set by NUM_BATCHES.
-# Each of the total_columns should be randomly assigned to one of the batches
-# for display (each batch should get the same number of columns assigned).
-# When a given domain finishes scrolling the same domain should begin scrolling again
-# in the next available column for its batch (also randomly chosen if more than one is available).
-# At the end of the UPDATE_INTERVAL all existing domains should fade out,
-# and the entire process begin again using the newest domains.
+# Description of visualization:
+# - A list of domains to scroll should be retrieved from the API every UPDATE_INTERVAL seconds.
+# - Each domain will scroll through the viewable area of the matrix from top to bottom.
+# - The last letter of each domain will appear first (in the top row) and will descend
+#   into view within that column, revealing the rest of the domain.
+# - Scrolling down will continue until the name reaches the bottom, at which point letters
+#   will be removed from view as they pass the bottom row, until the entire
+#   domain name has scrolled out of view.
+# - The specific column a given domain name will select for scrolling will be
+#   based on a "batch" system.
+# - Based on the number of domains returned (the maximum usable equal to total_columns),
+#   the top domains in order should be grouped into batches set by NUM_BATCHES.
+# - Each of the total_columns should be randomly assigned to one of the batches
+#   for display (each batch should get the same number of columns assigned).
+# - When a given domain finishes scrolling that same domain should begin scrolling again
+#   in the next available column for its batch (randomly chosen from the remainder 
+#   if more than one is available).
+# - At the end of the UPDATE_INTERVAL the API will be queried again and the batch
+#   distribution should be reset.
 
 var styx_api: StyxApi
 
@@ -30,11 +40,21 @@ var total_rows: int = resolution.y / 10.0  # const float LY = 10.0; // letter sp
 var max_rain_speed: float = 5.0  # Max possible speed is 10.0
 var min_rain_speed: float = 1.0  # Min possible speed is 0.1
 
+# State tracking
 var domain_counts = {}
+var active_domains = {}
+var update_timer: float = 0.0
+var batch_timer: float = 0.0
+var current_batch: int = 0
+var pending_batches = []
+var available_columns = []  # Track all available columns
+var batch_ranges = []  # Store column ranges for each batch
+var last_used_columns = {}  # Tracks last-used column for each domain
+var column_cooldown = {}  # Maps columns to the time they should remain unavailable
 
 var character_table: Dictionary = {
-    "0": 0.0, "1": 1.0, "2": 2.0, "3": 3.0, "4": 4.0,
-    "5": 5.0, "6": 6.0, "7": 7.0, "8": 8.0, "9": 9.0,
+    "0": 0.0,  "1": 1.0,  "2": 2.0,  "3": 3.0,  "4": 4.0,
+    "5": 5.0,  "6": 6.0,  "7": 7.0,  "8": 8.0,  "9": 9.0,
     "A": 10.0, "B": 11.0, "C": 12.0, "D": 13.0, "E": 14.0,
     "F": 15.0, "G": 16.0, "H": 17.0, "I": 18.0, "J": 19.0,
     "K": 20.0, "L": 21.0, "M": 22.0, "N": 23.0, "O": 24.0,
@@ -48,80 +68,270 @@ func _ready() -> void:
     window_size = Vector2(5, 5)
     shader_path = "res://shaders/matrix/matrix_domain.gdshader"
 
-    domain_counts = get_domains()
-
-    create_domain_windows()
-
-func get_domains() -> Dictionary:
-    return {
-        "graph.facebook.com:443": 100,
-        "google.com:443": 20,
-        "cf-proxy-cf-eu12-9dasdf3fb142345b.elb.eu-central-1.amazonaws.com:443": 1,
-    }    
-
-func create_domain_windows() -> void:
+    # Initialize columns
+    initialize_columns()
     
+    # Initialize API
+    styx_api = StyxApi.new()
+    styx_api.init(API_ENDPOINT + API_PARAMS)
+    styx_api.connect("data_received", Callable(self, "_on_data_received"))
+    add_child(styx_api)
+    
+    # Initial API request
+    styx_api.send_request()
+
+func initialize_columns() -> void:
+    available_columns = []
+    batch_ranges = []
+
+    # Initialize batch_ranges for each batch
+    batch_ranges.resize(NUM_BATCHES)
+    for i in range(NUM_BATCHES):
+        batch_ranges[i] = []
+
+    # Assign each column to a random batch
+    for col in range(total_columns):
+        var batch_idx = randi() % NUM_BATCHES
+        batch_ranges[batch_idx].append(col)
+
+    # All columns start as available
+    available_columns = range(total_columns)
+
+func _process(delta: float) -> void:
+    update_timer += delta
+    
+    if current_batch < NUM_BATCHES:
+        batch_timer += delta
+        if batch_timer >= BATCH_DELAY:
+            batch_timer = 0.0
+            display_next_batch()
+    
+    # Check for completed domains
+    var domains_to_remove = []
+    for domain in active_domains.keys():
+        var domain_info = active_domains[domain]
+        domain_info.elapsed_time += delta
+        
+        if domain_info.elapsed_time >= calculate_domain_duration(domain):
+            print("Removing domain: ", domain)
+            domains_to_remove.append(domain)
+    
+    # Handle completed domains
+    for domain in domains_to_remove:
+        cleanup_domain(domain)
+
+    # Check for interval expiration
+    if update_timer >= UPDATE_INTERVAL:
+        fade_out_all_domains()
+        update_timer = 0.0  # Prevents multiple triggers
+        
+    # Reduce column cooldowns over time
+    for col in column_cooldown.keys():
+        column_cooldown[col] -= delta
+        if column_cooldown[col] <= 0:
+            column_cooldown.erase(col)
+
+func fade_out_all_domains() -> void:
+    var domains = active_domains.keys().duplicate()
+    if domains.is_empty():
+        _on_all_domains_faded()
+        return
+
+    # Use a reference object to track remaining domains
+    var tracker = {"remaining": domains.size()}
+    
+    for domain in domains:
+        var domain_info = active_domains[domain]
+        if is_instance_valid(domain_info.mesh_instance):
+            var tween = create_tween()
+            tween.tween_method(
+                func(alpha: float):
+                    if is_instance_valid(domain_info.mesh_instance) and domain_info.mesh_instance.material_override:
+                        domain_info.mesh_instance.material_override.set_shader_parameter("alpha", alpha),
+                1.0, 0.0, 0.5  # TODO increate fade time
+            )
+            tween.connect("finished", func():
+                _remove_domain(domain)
+                tracker.remaining -= 1
+                if tracker.remaining == 0:
+                    _on_all_domains_faded()
+            )
+
+func _on_all_domains_faded() -> void:
+    # Clear all existing domains and reset state
+    active_domains.clear()
+    domain_counts.clear()
+    pending_batches.clear()
+    
+    initialize_columns()
+    current_batch = 0
+    batch_timer = 0.0
+    update_timer = 0.0
+    
+    # Request new data
+    styx_api.send_request()
+
+func _remove_domain(domain: String) -> void:
+    if active_domains.has(domain):
+        var domain_info = active_domains[domain]
+        if is_instance_valid(domain_info.mesh_instance):
+            domain_info.mesh_instance.queue_free()
+        active_domains.erase(domain)
+
+func get_available_column_for_batch(batch_idx: int, domain: String) -> int:
+    if batch_idx < 0 or batch_idx >= NUM_BATCHES:
+        return -1
+
+    var possible_columns = []
+    for col in batch_ranges[batch_idx]:
+        if available_columns.has(col) and last_used_columns.get(domain, -1) != col:
+            # Ensure column is not in cooldown
+            if not column_cooldown.has(col):
+                possible_columns.append(col)
+
+    if possible_columns.is_empty():
+        return -1
+
+    possible_columns.shuffle()
+    var chosen_column = possible_columns[0]
+
+    # Store the last-used column for the domain
+    last_used_columns[domain] = chosen_column
+    available_columns.erase(chosen_column)
+    return chosen_column
+
+func return_column_to_pool(column: int) -> void:
+    if column >= 0 and column < total_columns and not column in available_columns:
+        available_columns.append(column)
+
+func _on_data_received(_endpoint: String, data: Array) -> void:
+    domain_counts.clear()
+    pending_batches.clear()
+    
+    # Process received data
+    for entry in data:
+        if entry.has("address") and entry.has("count"):
+            domain_counts[entry.address] = entry.count
+    
+    prepare_batches()
+
+func prepare_batches() -> void:
     var domain_speeds = calculate_frequencies(domain_counts)
-    print("Domain speeds: ", domain_speeds)
     
     # Sort domains by access count (descending)
     var sorted_domains = domain_counts.keys()
     sorted_domains.sort_custom(func(a, b): return domain_counts[a] > domain_counts[b])
     
-    # Select a random column for each domain
-    var available_columns = range(total_columns)
-    
+    # Prepare domain data
+    var all_domains = []
     for domain in sorted_domains:
-        if available_columns.is_empty():
-            break
-        
-        var column = available_columns.pick_random()
-        available_columns.erase(column)
+        all_domains.append({
+            "domain": domain,
+            "speed": domain_speeds[domain]
+        })
+    
+    # Distribute domains across batches
+    pending_batches = []
+    var domains_per_batch = ceili(float(all_domains.size()) / NUM_BATCHES)
+    
+    for i in range(NUM_BATCHES):
+        var start_idx = i * domains_per_batch
+        var end_idx = mini(start_idx + domains_per_batch, all_domains.size())
+        if start_idx < all_domains.size():
+            pending_batches.append(all_domains.slice(start_idx, end_idx))
+    
+    # Start first batch
+    display_next_batch()
 
-        var domain_chars = []
-        for c in domain.reverse():
-            # Convert character to uppercase and match to float value from table
-            domain_chars.append(character_table[c.to_upper()])
+func display_next_batch() -> void:
+    if current_batch >= NUM_BATCHES or current_batch >= pending_batches.size():
+        return
+    
+    var batch_domains = pending_batches[current_batch]
+    
+    for domain_data in batch_domains:
+        var column = get_available_column_for_batch(current_batch, domain_data.domain)
+        if column != -1:
+            create_single_domain(domain_data.domain, domain_data.speed, column)
+    
+    current_batch += 1
 
-        shader_parameters = {
-            "resolution": resolution,
-            "render_speed": render_speed,
-            "rain_speed": domain_speeds[domain],
-            "domain": PackedFloat32Array(domain_chars),
-            "domain_length": domain.length(),
-            "domain_column": randi() % total_columns,
-        }
-        
-        setup_window()
-        
-        # Set render priority higher than MatrixWindow so it appears on top
-        if mesh_instance and mesh_instance.material_override is ShaderMaterial:
-            mesh_instance.material_override.render_priority = 1
-    
-    # Reset domain counts after displaying
-    domain_counts.clear()
+func create_single_domain(domain: String, speed: float, column: int) -> void:
+    var domain_chars = []
+    for c in domain.reverse():
+        domain_chars.append(character_table.get(c.to_upper(), 39.0))
 
-func calculate_frequencies(counts):
-    var total_requests = 0
-    var max_count = 0
+    # Calculate initial position to start above the display
+    var start_offset = float(domain.length()) * 10.0  # Multiply by character height
     
-    # Calculate total requests and find the maximum count
-    for count in counts.values():
-        total_requests += count
-        if count > max_count:
-            max_count = count
-    
-    if total_requests == 0:
-        return {}  # Avoid division by zero
-    
-    var max_frequency = max_rain_speed
-    var min_frequency = min_rain_speed
+    # Ensure consistent start time across batches (independent of system time)
+    var start_time = -start_offset / speed  # Ensures it starts above the screen
+
+    shader_parameters = {
+        "resolution": resolution,
+        "render_speed": render_speed,
+        "rain_speed": speed,
+        "domain": PackedFloat32Array(domain_chars),
+        "domain_length": domain.length(),
+        "domain_column": column,
+        "start_time": start_time,  # Adjusted start time for proper positioning
+    }
+
+    setup_window()
+
+    if mesh_instance and mesh_instance.material_override is ShaderMaterial:
+        mesh_instance.material_override.render_priority = 1
+
+    active_domains[domain] = {
+        "elapsed_time": 0.0,
+        "speed": speed,
+        "column": column,
+        "mesh_instance": mesh_instance,
+        "start_time": start_time,
+    }
+
+func calculate_frequencies(counts: Dictionary) -> Dictionary:
+    var max_count = counts.values().max()
+    if max_count == 0:
+        return {}
     
     var frequencies = {}
-    
-    for domain in counts.keys():
-        var count = counts[domain]
-        var normalized_freq = (count / float(max_count)) * (max_frequency - min_frequency) + min_frequency
+    for domain in counts:
+        var normalized_freq = (counts[domain] / float(max_count)) * (max_rain_speed - min_rain_speed) + min_rain_speed
         frequencies[domain] = normalized_freq
     
     return frequencies
+
+func calculate_domain_duration(domain: String) -> float:
+    var domain_info = active_domains[domain]
+    # Calculate time needed for domain to scroll completely out of view
+    # Add extra time to account for starting above the display
+    return ((domain.length() + total_rows + 10) * 10.0) / domain_info.speed
+
+func cleanup_domain(domain: String) -> void:
+    if active_domains.has(domain):
+        var domain_info = active_domains[domain]
+        
+        # Mark column as "cooling down" (prevents immediate reuse)
+        column_cooldown[domain_info.column] = UPDATE_INTERVAL  # Prevent reuse for full refresh cycle
+        
+        return_column_to_pool(domain_info.column)
+
+        # Only restart if domain is still in the dataset
+        if domain in domain_counts:
+            var batch_idx = get_batch_for_domain(domain)
+            if batch_idx != -1:
+                var new_column = get_available_column_for_batch(batch_idx, domain)
+                if new_column != -1:
+                    create_single_domain(domain, domain_info.speed, new_column)
+
+        if is_instance_valid(domain_info.mesh_instance):
+            domain_info.mesh_instance.queue_free()
+        active_domains.erase(domain)
+
+func get_batch_for_domain(domain: String) -> int:
+    for batch_idx in range(pending_batches.size()):
+        for domain_data in pending_batches[batch_idx]:
+            if domain_data.domain == domain:
+                return batch_idx
+    return -1
