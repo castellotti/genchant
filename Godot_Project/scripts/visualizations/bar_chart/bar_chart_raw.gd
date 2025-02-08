@@ -6,7 +6,7 @@ var update_timer: Timer
 const REFRESH_INTERVAL = 2.0
 const CONFIG = {
     # Provides raw network traffic data with timestamps
-    "api_path": "/api/v1/raw?relative=10s",
+    "endpoint": "/api/v1/raw?relative=10s",
     "color": [1, 0, 0],   # Red
     "transform": [0, 0, 0],
     "label": false

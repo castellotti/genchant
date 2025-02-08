@@ -7,6 +7,7 @@ render_mode unshaded, blend_mix, depth_draw_opaque;
 uniform vec2 resolution = vec2(1024.0, 1024.0);
 uniform float render_speed : hint_range(0.1, 2.0) = 0.36;
 uniform float rain_speed   : hint_range(0.1, 10.0) = 1.0;
+uniform bool domain_background_transparent = true;
 
 // Domain text parameters:
 //  - domain is an array (max length 256) of letter “codes” (see below)
@@ -71,7 +72,7 @@ vec2 getD(float d) {
     if (index == 26.0) return vec2(935188.0,698650.0);   // Q
     if (index == 27.0) return vec2(1983767.0,1198242.0); // R
     if (index == 28.0) return vec2(935171.0,1058972.0);  // S
-    if (index == 29.0) return vec2(935171.0,1058972.0);  // T
+    if (index == 29.0) return vec2(2035777.0,33288.0);  // T
     if (index == 30.0) return vec2(1131796.0,665756.0);  // U
     if (index == 31.0) return vec2(1131796.0,664840.0);  // V
     if (index == 32.0) return vec2(1131861.0,699028.0);  // W
@@ -94,7 +95,7 @@ vec2 getD(float d) {
 void fragment() {
     vec2 uv = UV * resolution;
 
-    // Only operate on the chosen column.
+    // Only operate on the chosen column
     if (floor(uv.x / LX) != float(domain_column)) {
         ALPHA = 0.0;
     } else {
@@ -129,7 +130,8 @@ void fragment() {
             // where sprite() returns a value.
             vec3 col = mix(vec3(0.0), vec3(1.0), step(0.5, s));
             ALBEDO = col;
-            ALPHA = 1.0;
+            // 99.95% black background, 0.05% transparency or solid black
+            ALPHA = domain_background_transparent ? mix(0.0005, 1.0, step(0.5, s)) : 1.0;
         }
     }
 }

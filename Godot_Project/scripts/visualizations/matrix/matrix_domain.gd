@@ -1,56 +1,46 @@
 extends VisualizationWindow
 class_name MatrixDomainWindow
 
+# A list of domains to scroll should be retrieved from the API every UPDATE_INTERVAL seconds.
+# Based on the number of domains returned (the maximum usable equal to total_columns),
+# the top domains in order should be grouped into batches set by NUM_BATCHES.
+# Each of the total_columns should be randomly assigned to one of the batches
+# for display (each batch should get the same number of columns assigned).
+# When a given domain finishes scrolling the same domain should begin scrolling again
+# in the next available column for its batch (also randomly chosen if more than one is available).
+# At the end of the UPDATE_INTERVAL all existing domains should fade out,
+# and the entire process begin again using the newest domains.
+
+var styx_api: StyxApi
+
+# Configuration
+var UPDATE_INTERVAL: float = 30.0  # Time in seconds between API updates
+var API_ENDPOINT: String = "/api/v1/matrix"
+var API_PARAMS: String = "?relative=60s"
+
+# Batch configuration
+var NUM_BATCHES: int = 3  # Number of batches to split domains into
+var BATCH_DELAY: float = 10.0  # Seconds between each batch
+
+# Core properties
 var resolution = Vector2(1024, 1024)
 var render_speed: float = 0.36
-var total_columns : int = resolution.x / 8.0  # const float LX = 8.0; // letter space x
-var total_rows : int = resolution.y / 10.0  # const float LY = 10.0; // letter space y
-var max_rain_speed : float = 5.0  # Max possible speed is 10.0
-var min_rain_speed : float = 1.0  # Min possible speed is 0.1
+var total_columns: int = resolution.x / 8.0  # const float LX = 8.0; // letter space x
+var total_rows: int = resolution.y / 10.0  # const float LY = 10.0; // letter space y
+var max_rain_speed: float = 5.0  # Max possible speed is 10.0
+var min_rain_speed: float = 1.0  # Min possible speed is 0.1
 
 var domain_counts = {}
 
 var character_table: Dictionary = {
-    "0": 0.0,
-    "1": 1.0,
-    "2": 2.0,
-    "3": 3.0,
-    "4": 4.0,
-    "5": 5.0,
-    "6": 6.0,
-    "7": 7.0,
-    "8": 8.0,
-    "9": 9.0,
-    "A": 10.0,
-    "B": 11.0,
-    "C": 12.0,
-    "D": 13.0,
-    "E": 14.0,
-    "F": 15.0,
-    "G": 16.0,
-    "H": 17.0,
-    "I": 18.0,
-    "J": 19.0,
-    "K": 20.0,
-    "L": 21.0,
-    "M": 22.0,
-    "N": 23.0,
-    "O": 24.0,
-    "P": 25.0,
-    "Q": 26.0,
-    "R": 27.0,
-    "S": 28.0,
-    "T": 29.0,
-    "U": 30.0,
-    "V": 31.0,
-    "W": 32.0,
-    "X": 33.0,
-    "Y": 34.0,
-    "Z": 35.0,
-    ".": 36.0,
-    "-": 37.0,
-    ":": 38.0,
-    " ": 39.0
+    "0": 0.0, "1": 1.0, "2": 2.0, "3": 3.0, "4": 4.0,
+    "5": 5.0, "6": 6.0, "7": 7.0, "8": 8.0, "9": 9.0,
+    "A": 10.0, "B": 11.0, "C": 12.0, "D": 13.0, "E": 14.0,
+    "F": 15.0, "G": 16.0, "H": 17.0, "I": 18.0, "J": 19.0,
+    "K": 20.0, "L": 21.0, "M": 22.0, "N": 23.0, "O": 24.0,
+    "P": 25.0, "Q": 26.0, "R": 27.0, "S": 28.0, "T": 29.0,
+    "U": 30.0, "V": 31.0, "W": 32.0, "X": 33.0, "Y": 34.0,
+    "Z": 35.0, ".": 36.0, "-": 37.0, ":": 38.0, " ": 39.0
 }
 
 func _ready() -> void:

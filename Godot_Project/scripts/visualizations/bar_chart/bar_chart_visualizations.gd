@@ -10,7 +10,7 @@ func initialize(config: Dictionary) -> void:
     
     # Create and initialize the API
     styx_api = StyxApi.new()
-    styx_api.init(configuration["api_path"])
+    styx_api.init(configuration["endpoint"])
     
     # Listen for data; when received, _on_data_received() will be called.
     if not styx_api.is_connected("data_received", Callable(self, "_on_data_received")):
