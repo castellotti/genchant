@@ -13,6 +13,7 @@ const float distance_falloff_modifier = 0.3; // default: 0.3
 const float horizon_width = 0.024; // default: 0.05
 const float horizon_position = 0.1; // default: 0.15
 const float brightness = 15.0; // 1.5 to 35.0 is a good range
+const float transparency = 0.1; // alpha value for shader
 
 float random(float x) {
     return fract(sin(x) * 10000.0);
@@ -42,5 +43,5 @@ void fragment() {
 
     // Adjust the final color intensity
     vec3 color = vec3(0.0, 1.0, 0.2) * r * brightness;
-    COLOR = vec4(color, 0.5);
+    COLOR = vec4(color, transparency);
 }
