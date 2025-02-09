@@ -2,7 +2,8 @@ extends Node
 class_name StyxApi
 
 # This line will generate the following debugger warning, please ignore:
-# The signal "data_received" is declared but never explicitly used in the cslass.
+# The signal "data_received" is declared but never explicitly used in the class
+@warning_ignore("unused_signal")
 signal data_received(endpoint: String, data: Array)
 
 # Network client setup (UDP for native clients, TCP HTTPRequest for WebXR web export)
