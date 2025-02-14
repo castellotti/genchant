@@ -45,7 +45,7 @@ func _ready():
             Globals.joystick_touch_pad_enabled = true
     
     update_joystick_touch_pad(Globals.joystick_touch_pad_enabled)
-    
+
     # Initialize visualizations after environment interface is established
     initialize_visualizations()
 
@@ -160,20 +160,18 @@ func initialize_visualizations() -> void:
     var visualizations_scene = get_node_or_null("visualizations")
     
     if visualizations_scene:
-        #visualizations_scene.show_visualization("cube")
         visualizations_scene.show_visualization("sphere")
         
-        #visualizations_scene.show_visualization("bar_chart_raw")
-        #visualizations_scene.show_visualization("bar_chart_remote")
-
         # The following visualizations entirely depend on shaders
         if not Globals.is_running_in_visionos:
             # Godot Vision does not currently support shaders
+            visualizations_scene.show_visualization("matrix_3d_rain")
+
             visualizations_scene.show_visualization("matrix_background")
             visualizations_scene.show_visualization("matrix_domain")
 
-            visualizations_scene.show_visualization("left")
-            visualizations_scene.show_visualization("right")
+            #visualizations_scene.show_visualization("left")
+            #visualizations_scene.show_visualization("right")
             #visualizations_scene.show_visualization("top")
 
         else:

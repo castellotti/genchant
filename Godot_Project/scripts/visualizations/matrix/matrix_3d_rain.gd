@@ -1,4 +1,5 @@
-extends Node
+extends Node3D
+class_name Matrix3DRainVisualization
 
 var shader_material: ShaderMaterial
 var background_rect: ColorRect

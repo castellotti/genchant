@@ -93,7 +93,7 @@ func _physics_process(delta):
         input_dir.x -= 1
     if Input.is_action_pressed("move_right"):
         input_dir.x += 1
-        
+
     # Reset to original position on Home key or button
     if Input.is_action_pressed("home"):
         reset_position()
@@ -121,11 +121,3 @@ func _physics_process(delta):
 
 func on_jump_button_pressed():
     jump_just_pressed = true
-    
-    if visualizations_scene:
-        visualizations_scene.toggle_visualization("matrix_background")
-        visualizations_scene.toggle_visualization("matrix_domain")
-        #visualizations_scene.toggle_visualization("sphere")
-        #visualizations_scene.toggle_visualization("cube")
-        #visualizations_scene.toggle_visualization("bar_chart_raw")
-        #visualizations_scene.toggle_visualization("bar_chart_remote")

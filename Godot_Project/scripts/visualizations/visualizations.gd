@@ -12,8 +12,10 @@ var visualization_scenes = {
 var visualization_classes = {
     "bar_chart_raw": BarChartRawVisualization,
     "bar_chart_remote": BarChartRemoteVisualization,
+    "matrix_3d_rain": Matrix3DRainVisualization,
     "matrix_background": MatrixBackgroundWindow,
     "matrix_domain": MatrixDomainWindow,
+    "matrix_debug": MatrixDebugWindow,
     "sphere": SphereVisualization,
     "left": LeftWindow,
     "right": RightWindow,
