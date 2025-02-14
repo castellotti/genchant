@@ -6,7 +6,7 @@ albedo_color = Color(0, 0.501961, 0, 1)
 [node name="ConeNode3D" type="Node3D"]
 
 [node name="CSGCylinder3D" type="CSGCylinder3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -0.707107, -0.707107, 0, 0.707107, -0.707107, 0, 1, 0)
+transform = Transform3D(1, 0, 0, 0, -0.707107, -0.707107, 0, 0.707107, -0.707107, 0, 1.75, 0)
 radius = 1.0
 sides = 64
 cone = true

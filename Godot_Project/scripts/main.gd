@@ -1,15 +1,11 @@
 extends Node3D
 
-var xr_interface : XRInterface
-var passthrough_enabled : bool = false
-var is_running_in_web : bool = OS.get_name() == "Web" or OS.get_name() == "HTML5"
-var joystick_touch_pad_enabled : bool = false
 var interface_alerts : bool = false
+var xr_interface : XRInterface
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
 
-    if not is_running_in_web:
+    if not Globals.is_running_in_web:
         $ui/WebCanvasLayer.visible = false
         xr_interface = XRServer.find_interface("OpenXR")
         if xr_interface and xr_interface.is_initialized():
@@ -20,10 +16,10 @@ func _ready():
 
             get_viewport().use_xr = true
 
-            passthrough_enabled = enable_passthrough()
+            Globals.passthrough_enabled = enable_passthrough()
         else:
             print("OpenXR not initialized, please check if your headset is connected")
-            joystick_touch_pad_enabled = true
+            Globals.joystick_touch_pad_enabled = true
 
     else:        
         $ui/WebCanvasLayer.visible = true
@@ -46,10 +42,13 @@ func _ready():
             xr_interface.is_session_supported("immersive-vr")
             #xr_interface.is_session_supported("immersive-ar")
         else :
-            joystick_touch_pad_enabled = true
+            Globals.joystick_touch_pad_enabled = true
     
-    update_joystick_touch_pad(joystick_touch_pad_enabled)
-        
+    update_joystick_touch_pad(Globals.joystick_touch_pad_enabled)
+
+    # Initialize visualizations after environment interface is established
+    initialize_visualizations()
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
@@ -124,8 +123,8 @@ func _webxr_session_started() -> void:
     $ui/WebCanvasLayer.visible = false
     # This tells Godot to start rendering to the headset.
     get_viewport().use_xr = true
-    
-    passthrough_enabled = enable_passthrough()
+
+    Globals.passthrough_enabled = enable_passthrough()
 
     # This will be the reference space type you ultimately got, out of the
     # types that you requested above. This is useful if you want the game to
@@ -156,3 +155,25 @@ func update_joystick_touch_pad(enable : bool) -> void:
         
         $objects/joystick_touch_pad.visible = true
         $objects/joystick_touch_pad/head/Camera3D.current = true
+
+func initialize_visualizations() -> void:
+    var visualizations_scene = get_node_or_null("visualizations")
+    
+    if visualizations_scene:
+        visualizations_scene.show_visualization("sphere")
+        
+        # The following visualizations entirely depend on shaders
+        if not Globals.is_running_in_visionos:
+            # Godot Vision does not currently support shaders
+            visualizations_scene.show_visualization("matrix_3d_rain")
+
+            visualizations_scene.show_visualization("matrix_background")
+            visualizations_scene.show_visualization("matrix_domain")
+
+            #visualizations_scene.show_visualization("left")
+            #visualizations_scene.show_visualization("right")
+            #visualizations_scene.show_visualization("top")
+
+        else:
+            visualizations_scene.show_visualization("bar_chart_raw")
+            visualizations_scene.show_visualization("bar_chart_remote")

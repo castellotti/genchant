@@ -9,6 +9,7 @@
 // This file is part of styx-godot and is released under the MIT License.
 // See LICENSE file in the project root for full license information.
 
+import Darwin
 import GodotVision
 import RealityKit
 import SwiftUI
@@ -76,6 +77,9 @@ struct StyxApp: App {
             print("already did setup!")
             return
         }
+        
+        setenv("GODOT_PLATFORM", "visionOS", 1)
+        
         godotVision.perFrameTick = { [weak handTracking] (deltaTime: TimeInterval) in
             if let handTracking {
                 handTracking.update(deltaTime: deltaTime)
