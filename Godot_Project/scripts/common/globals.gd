@@ -1,10 +1,14 @@
 extends Node
 
 # Environment
-var is_running_in_visionos : bool = OS.get_name() == "iOS" and OS.get_environment("GODOT_PLATFORM") == "visionOS"
-var is_running_in_web : bool = OS.get_name() == "Web" or OS.get_name() == "HTML5"
-var joystick_touch_pad_enabled : bool = false
-var passthrough_enabled : bool = false
+var DEBUG: bool = true
+var is_running_in_visionos: bool = OS.get_name() == "iOS" and OS.get_environment("GODOT_PLATFORM") == "visionOS"
+var is_running_in_web: bool = OS.get_name() == "Web" or OS.get_name() == "HTML5"
+var joystick_touch_pad_enabled: bool = false
+var passthrough_enabled: bool = false
+
+# UI
+var mesh_scene : Node3D
 
 # User
 var EYE_HEIGHT: float = 1.75
