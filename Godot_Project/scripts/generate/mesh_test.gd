@@ -1,11 +1,11 @@
 extends Node3D
 
-const FORWARD_OFFSET = 2.0  # Meters in front of player
-const SIDE_OFFSET = 2.0    # Meters to left/right
+const FORWARD_OFFSET = 1.0  # Meters in front of player
+const SIDE_OFFSET = 1.0    # Meters to left/right
 
-@export var stream_scale: float = 0.05
-@export var final_scale: float = 0.1
-@export var glb_scale: float = 0.1
+@export var stream_scale: float = 1.0
+@export var final_scale: float = 1.0
+@export var glb_scale: float = 0.05
 
 var _stream_mesh_visualizer: MeshVisualizer
 var _final_mesh_visualizer: MeshVisualizer

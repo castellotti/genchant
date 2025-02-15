@@ -13,11 +13,21 @@ var _index_buffer := []
 var _number_buffer := ""
 var _parsing_faces := false
 var _vertex_count := 0
+var _total_vertices := 0
+var _total_faces := 0
 
 func _init() -> void:
     _http_client = HTTPClient.new()
 
 func generate_mesh(prompt: String) -> void:
+    if Globals.LOG_STREAM:
+        print("Generating 3D mesh for prompt: " + prompt)
+        print("Using temperature: " + str(Globals.TEMPERATURE))
+        print("Max tokens: " + str(Globals.MAX_TOKENS))
+        print("Using backend: ollama")
+        print("Using model: " + Globals.MODEL_NAME)
+        print("Generating mesh using MeshGenerator")
+
     var host = Globals.OLLAMA_HOST.split("://")[1]
     var port = host.split(":")[1].to_int()
     host = host.split(":")[0]
@@ -79,6 +89,20 @@ Here is the 3D mesh in .obj format:",
     # Final mesh update with all vertices and indices
     if not _current_vertices.is_empty():
         mesh_update.emit(_current_vertices, _current_indices)
+        
+        if Globals.LOG_STREAM:
+            print("\nMesh content:")
+            # Print all vertices
+            for i in range(_current_vertices.size()):
+                var v = _current_vertices[i]
+                print("v %d %d %d" % [v.x, v.y, v.z])
+            
+            # Print all faces (convert from 0-based to 1-based indices)
+            for i in range(0, _current_indices.size(), 3):
+                print("f %d %d %d" % [_current_indices[i] + 1, _current_indices[i + 1] + 1, _current_indices[i + 2] + 1])
+            
+            print("\nNumber of vertices: " + str(_total_vertices))
+            print("Number of faces: " + str(_total_faces))
     
     _http_client.close()
     generation_complete.emit(true)
@@ -92,8 +116,6 @@ func _process_chunk(chunk: String) -> void:
         var line = lines[i].strip_edges()
         if line.is_empty():
             continue
-        elif Globals.DEBUG:
-            print(line)
         
         # Parse JSON response from Ollama
         var json = JSON.parse_string(line)
@@ -130,6 +152,11 @@ func _process_mesh_data(content: String) -> void:
                         # If we have 3 indices, we have a complete triangle
                         if _index_buffer.size() == 3:
                             _current_indices.append_array(_index_buffer)
+                            _total_faces += 1
+                            
+                            if Globals.LOG_STREAM:
+                                print("f %d %d %d" % [_index_buffer[0] + 1, _index_buffer[1] + 1, _index_buffer[2] + 1])
+                            
                             # For faces with more than 3 vertices, create additional triangles
                             _index_buffer = [_index_buffer[0]]
                 else:
@@ -139,6 +166,11 @@ func _process_mesh_data(content: String) -> void:
                         var vertex = Vector3(_vertex_buffer[0], _vertex_buffer[1], _vertex_buffer[2])
                         _current_vertices.append(vertex)
                         _vertex_count += 1
+                        _total_vertices += 1
+                        
+                        if Globals.LOG_STREAM:
+                            print("v %.1f %.1f %.1f" % [vertex.x, vertex.y, vertex.z])
+                        
                         _vertex_buffer.clear()
                         
                         # Update mesh every few vertices for visual feedback
@@ -155,3 +187,5 @@ func clear() -> void:
     _response_data = ""
     _parsing_faces = false
     _vertex_count = 0
+    _total_vertices = 0
+    _total_faces = 0
