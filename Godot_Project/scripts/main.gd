@@ -56,7 +56,6 @@ func _ready():
     # Initialize visualizations after environment interface is established
     initialize_visualizations()
 
-
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
     pass

@@ -4,9 +4,6 @@ class_name MeshGenerator
 signal mesh_update(vertices: PackedVector3Array, indices: PackedInt32Array)
 signal generation_complete(success: bool)
 
-const OLLAMA_HOST = "http://localhost:11434"
-const MODEL_NAME = "hf.co/bartowski/LLaMA-Mesh-GGUF:Q4_K_M"
-
 var _http_client: HTTPClient
 var _response_data := ""
 var _current_vertices := PackedVector3Array()
@@ -21,7 +18,7 @@ func _init() -> void:
     _http_client = HTTPClient.new()
 
 func generate_mesh(prompt: String) -> void:
-    var host = OLLAMA_HOST.split("://")[1]
+    var host = Globals.OLLAMA_HOST.split("://")[1]
     var port = host.split(":")[1].to_int()
     host = host.split(":")[0]
     var err = _http_client.connect_to_host(host, port)
@@ -44,7 +41,7 @@ func generate_mesh(prompt: String) -> void:
     # Prepare the request
     var headers = ["Content-Type: application/json"]
     var body = JSON.stringify({
-        "model": MODEL_NAME,
+        "model": Globals.MODEL_NAME,
         "prompt": prompt,
         "stream": true,
         "template": "<|start_header_id|>system<|end_header_id|>
@@ -52,8 +49,8 @@ You are a helpful assistant that can generate 3D obj files. Generate a complete 
 {prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 Here is the 3D mesh in .obj format:",
         "options": {
-            "temperature": 0.95,
-            "num_predict": 4096,
+            "temperature": Globals.TEMPERATURE,
+            "num_predict": Globals.MAX_TOKENS,
             "stop": [
               "<|eot_id|>"
             ]
@@ -95,6 +92,8 @@ func _process_chunk(chunk: String) -> void:
         var line = lines[i].strip_edges()
         if line.is_empty():
             continue
+        elif Globals.DEBUG:
+            print(line)
         
         # Parse JSON response from Ollama
         var json = JSON.parse_string(line)
