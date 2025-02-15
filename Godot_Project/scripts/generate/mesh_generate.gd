@@ -169,7 +169,7 @@ func _process_mesh_data(content: String) -> void:
                         _total_vertices += 1
                         
                         if Globals.LOG_STREAM:
-                            print("v %.1f %.1f %.1f" % [vertex.x, vertex.y, vertex.z])
+                            print("v %d %d %d" % [vertex.x, vertex.y, vertex.z])
                         
                         _vertex_buffer.clear()
                         
