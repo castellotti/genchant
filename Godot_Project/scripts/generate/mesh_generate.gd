@@ -15,11 +15,23 @@ var _parsing_faces := false
 var _vertex_count := 0
 var _total_vertices := 0
 var _total_faces := 0
+var _metadata: MeshMetadata  # New variable to store metadata
+var _generation_start_time: int  # Track generation start time
 
 func _init() -> void:
     _http_client = HTTPClient.new()
 
 func generate_mesh(prompt: String) -> void:
+    # Initialize new metadata instance
+    _metadata = MeshMetadata.new()
+    _metadata.prompt = prompt
+    _metadata.model = Globals.MODEL_NAME
+    _metadata.temperature = Globals.TEMPERATURE
+    _metadata.max_tokens = Globals.MAX_TOKENS
+    _metadata.backend = "ollama"
+    _metadata.generation_timestamp = Time.get_unix_time_from_system()
+    _generation_start_time = Time.get_ticks_msec()
+
     if Globals.LOG_STREAM:
         print("Generating 3D mesh for prompt: " + prompt)
         print("Using temperature: " + str(Globals.TEMPERATURE))
@@ -86,24 +98,30 @@ Here is the 3D mesh in .obj format:",
             _process_chunk(text)
         await get_tree().process_frame
     
-    # Final mesh update with all vertices and indices
+    # Update metadata when complete
+    _metadata.generation_time_ms = Time.get_ticks_msec() - _generation_start_time
+    _metadata.vertices = _current_vertices
+    _metadata.indices = _current_indices
+
+    # Calculate bounds and scale factor
     if not _current_vertices.is_empty():
+        _update_metadata_bounds()
         mesh_update.emit(_current_vertices, _current_indices)
-        
+
         if Globals.LOG_STREAM:
             print("\nMesh content:")
             # Print all vertices
             for i in range(_current_vertices.size()):
                 var v = _current_vertices[i]
                 print("v %d %d %d" % [v.x, v.y, v.z])
-            
+
             # Print all faces (convert from 0-based to 1-based indices)
             for i in range(0, _current_indices.size(), 3):
                 print("f %d %d %d" % [_current_indices[i] + 1, _current_indices[i + 1] + 1, _current_indices[i + 2] + 1])
-            
+
             print("\nNumber of vertices: " + str(_total_vertices))
             print("Number of faces: " + str(_total_faces))
-    
+
     _http_client.close()
     generation_complete.emit(true)
 
@@ -153,10 +171,10 @@ func _process_mesh_data(content: String) -> void:
                         if _index_buffer.size() == 3:
                             _current_indices.append_array(_index_buffer)
                             _total_faces += 1
-                            
+
                             if Globals.LOG_STREAM:
                                 print("f %d %d %d" % [_index_buffer[0] + 1, _index_buffer[1] + 1, _index_buffer[2] + 1])
-                            
+
                             # For faces with more than 3 vertices, create additional triangles
                             _index_buffer = [_index_buffer[0]]
                 else:
@@ -167,16 +185,35 @@ func _process_mesh_data(content: String) -> void:
                         _current_vertices.append(vertex)
                         _vertex_count += 1
                         _total_vertices += 1
-                        
+
                         if Globals.LOG_STREAM:
                             print("v %d %d %d" % [vertex.x, vertex.y, vertex.z])
-                        
+
                         _vertex_buffer.clear()
-                        
+
+                        # Update bounds in metadata
+                        _update_metadata_bounds()
+
                         # Update mesh every few vertices for visual feedback
                         if _current_vertices.size() % Globals.vertex_spheres_render_interval == 0:
                             mesh_update.emit(_current_vertices, _current_indices)
                 _number_buffer = ""
+
+func _update_metadata_bounds() -> void:
+    if _current_vertices.is_empty():
+        return
+
+    # Update bounds
+    var last_vertex = _current_vertices[-1]
+    if _metadata.bounds.size == Vector3.ZERO:
+        _metadata.bounds = AABB(last_vertex, Vector3.ZERO)
+    else:
+        _metadata.bounds = _metadata.bounds.expand(last_vertex)
+
+    # Calculate scale factor
+    var max_dimension = max(_metadata.bounds.size.x,
+    max(_metadata.bounds.size.y, _metadata.bounds.size.z))
+    _metadata.scale_factor = _metadata.target_size / max_dimension if max_dimension > 0 else 1.0
 
 func clear() -> void:
     _current_vertices.clear()
@@ -189,3 +226,8 @@ func clear() -> void:
     _vertex_count = 0
     _total_vertices = 0
     _total_faces = 0
+    _metadata = null  # Clear metadata
+
+# Getter for metadata
+func get_metadata() -> MeshMetadata:
+    return _metadata

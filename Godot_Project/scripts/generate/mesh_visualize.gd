@@ -250,11 +250,9 @@ func _on_generation_complete(success: bool) -> void:
         _metadata.generation_time_ms = (Time.get_unix_time_from_system() - _metadata.generation_timestamp) * 1000
         _update_mesh(false)  # false for final mesh
         
-        # Save metadata to file
-        var save_path = "user://last_mesh_metadata.json"
-        var err = _metadata.save_to_file(save_path)
-        if err != OK:
-            push_error("Failed to save mesh metadata")
+        if Globals.DEBUG:
+            print("metadata:")
+            print(_metadata.to_json_string())
         
         # Only remove vertex spheres after final mesh is created
         if not Globals.DEBUG:

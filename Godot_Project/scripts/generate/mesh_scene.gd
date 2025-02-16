@@ -13,9 +13,7 @@ func _ready() -> void:
     
     # Set up initial transform
     mesh_visualizer.position = Vector3.ZERO
-    # TODO: Disabled to handle in code, revisit after rending complete
-    # scale = Vector3.ONE * 0.1  # Scale down for reasonable size in XR
-#    scale = Vector3.ONE
+    scale = Vector3.ONE
 
 func generate() -> void:
     if is_generating:

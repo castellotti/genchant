@@ -93,6 +93,19 @@ func to_dict() -> Dictionary:
         }
     }
 
+# New function to generate JSON string
+func to_json_string() -> String:
+    return JSON.stringify(to_dict())
+
+# Updated save method to use the new JSON string function
+func save_to_file(path: String) -> Error:
+    var file = FileAccess.open(path, FileAccess.WRITE)
+    if file == null:
+        return FileAccess.get_open_error()
+    
+    file.store_string(to_json_string())
+    return OK
+
 static func from_dict(data: Dictionary) -> MeshMetadata:
     var metadata = MeshMetadata.new()
     
@@ -172,16 +185,6 @@ static func _unpack_vector3_array(arr: Array) -> PackedVector3Array:
     for v in arr:
         result.append(Vector3(v.get("x", 0), v.get("y", 0), v.get("z", 0)))
     return result
-
-# Save metadata to a file
-func save_to_file(path: String) -> Error:
-    var file = FileAccess.open(path, FileAccess.WRITE)
-    if file == null:
-        return FileAccess.get_open_error()
-    
-    var json_string = JSON.stringify(to_dict())
-    file.store_string(json_string)
-    return OK
 
 # Load metadata from a file
 static func load_from_file(path: String) -> MeshMetadata:
