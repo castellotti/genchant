@@ -174,7 +174,7 @@ func _process_mesh_data(content: String) -> void:
                         _vertex_buffer.clear()
                         
                         # Update mesh every few vertices for visual feedback
-                        if _current_vertices.size() % 10 == 0:
+                        if _current_vertices.size() % Globals.vertex_spheres_render_interval == 0:
                             mesh_update.emit(_current_vertices, _current_indices)
                 _number_buffer = ""
 

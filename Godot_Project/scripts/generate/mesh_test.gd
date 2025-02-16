@@ -1,8 +1,5 @@
 extends Node3D
 
-const FORWARD_OFFSET = 1.0  # Meters in front of player
-const SIDE_OFFSET = 1.0  # Meters to left/right
-
 var _stream_mesh_visualizer: MeshVisualizer
 var _final_mesh_visualizer: MeshVisualizer
 var _glb_visualizer: Node3D
@@ -19,9 +16,9 @@ func _read_file_content(file_path: String) -> String:
 
 func _ready() -> void:
     # Set up base positions for the three test objects
-    var left_pos = Vector3(-SIDE_OFFSET - 2.0, 0, FORWARD_OFFSET)
-    var center_pos = Vector3(0, 0, FORWARD_OFFSET)
-    var right_pos = Vector3(SIDE_OFFSET, 0, FORWARD_OFFSET)
+    var left_pos = Vector3(-1.5, 1.0, -2.0)
+    var center_pos = Vector3(0, 1.0, -2.0)
+    var right_pos = Vector3(1.5, 1.0, -2.0)
 
     # Initialize visualizers with basic positioning
     _setup_visualizers(left_pos, center_pos, right_pos)
@@ -31,17 +28,23 @@ func _ready() -> void:
     _run_tests(test_files)
 
 func _setup_visualizers(left_pos: Vector3, center_pos: Vector3, right_pos: Vector3) -> void:
+    # Create stream mesh visualizer
     _stream_mesh_visualizer = MeshVisualizer.new()
     add_child(_stream_mesh_visualizer)
-    _stream_mesh_visualizer.position = left_pos
-
+    # Apply offset relative to its default position
+    _stream_mesh_visualizer.position += left_pos
+    
+    # Create final mesh visualizer
     _final_mesh_visualizer = MeshVisualizer.new()
     add_child(_final_mesh_visualizer)
-    _final_mesh_visualizer.position = right_pos
-
+    # Apply offset relative to its default position
+    _final_mesh_visualizer.position += right_pos
+    
+    # Create GLB visualizer
     _glb_visualizer = Node3D.new()
     add_child(_glb_visualizer)
-    _glb_visualizer.position = center_pos
+    # Apply offset relative to its default position
+    _glb_visualizer.position += center_pos
 
 func _get_test_files() -> Dictionary:
     return {
@@ -62,13 +65,17 @@ func _test_stream_mesh(log_file: String) -> void:
     var content = _read_file_content(log_file)
     if content.is_empty():
         return
-    _process_mesh_data(content, _stream_mesh_visualizer, true)
+        
+    var metadata = MeshMetadata.parse_from_log(content)
+    _process_mesh_data(metadata, _stream_mesh_visualizer, true)
 
 func _test_final_mesh(log_file: String) -> void:
     var content = _read_file_content(log_file)
     if content.is_empty():
         return
-    _process_mesh_data(content, _final_mesh_visualizer, false)
+        
+    var metadata = MeshMetadata.parse_from_log(content)
+    _process_mesh_data(metadata, _final_mesh_visualizer, false)
 
 func _test_glb_mesh(glb_file: String) -> void:
     if not FileAccess.file_exists(glb_file):
@@ -89,39 +96,28 @@ func _load_glb_scene(glb_file: String) -> Node3D:
     var err = gltf_doc.append_from_file(glb_file, gltf_state)
     return gltf_doc.generate_scene(gltf_state) if err == OK else null
 
-func _process_mesh_data(content: String, target_visualizer: MeshVisualizer, is_stream: bool) -> void:
-    var vertex_array = PackedVector3Array()
-    var index_array = PackedInt32Array()
-    var mesh_content = content.substr(content.find("Mesh content:"))
-    
-    for line in mesh_content.split("\n"):
-        line = line.strip_edges()
-        if line.is_empty() or line == "Mesh content:":
-            continue
-
-        if line.begins_with("v "):
-            var parts = line.split(" ", false)
-            if parts.size() >= 4:
-                vertex_array.append(Vector3(
-                    float(parts[1]),
-                    float(parts[2]),
-                    float(parts[3])
-                ))
-                if is_stream and vertex_array.size() % 10 == 0:
-                    target_visualizer._on_mesh_update(vertex_array, index_array)
-
-        elif line.begins_with("f "):
-            var parts = line.split(" ", false)
-            if parts.size() >= 4:
-                index_array.append(int(parts[1]) - 1)
-                index_array.append(int(parts[2]) - 1)
-                index_array.append(int(parts[3]) - 1)
-                if is_stream and index_array.size() % 30 == 0:
-                    target_visualizer._on_mesh_update(vertex_array, index_array)
-
-        elif line.begins_with("Number of"):
-            break
-
-    if not vertex_array.is_empty():
-        target_visualizer._on_mesh_update(vertex_array, index_array)
-        target_visualizer._on_generation_complete(true)
+func _process_mesh_data(metadata: MeshMetadata, target_visualizer: MeshVisualizer, is_stream: bool) -> void:
+    if metadata.vertices.is_empty():
+        return
+        
+    if is_stream:
+        # Simulate streaming updates
+        var stream_vertices = PackedVector3Array()
+        var stream_indices = PackedInt32Array()
+        
+        for i in range(metadata.vertices.size()):
+            stream_vertices.append(metadata.vertices[i])
+            if i % Globals.vertex_spheres_render_interval == 0:  # Update per vertices
+                target_visualizer._on_mesh_update(stream_vertices, stream_indices)
+                
+        for i in range(0, metadata.indices.size(), 3):
+            stream_indices.append(metadata.indices[i])
+            stream_indices.append(metadata.indices[i + 1])
+            stream_indices.append(metadata.indices[i + 2])
+            if i % 3 * Globals.vertex_spheres_render_interval == 0:  # Update per faces (3 indices per vertex)
+                target_visualizer._on_mesh_update(stream_vertices, stream_indices)
+    else:
+        # Send complete mesh at once
+        target_visualizer._on_mesh_update(metadata.vertices, metadata.indices)
+        
+    target_visualizer._on_generation_complete(true)

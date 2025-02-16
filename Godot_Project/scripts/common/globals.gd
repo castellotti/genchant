@@ -30,3 +30,4 @@ const TEST_LOG_FILE = "generate-verbose.log"
 const TEST_DEBUG_FILE = "generate-gdscript.log"
 const TEST_GLB_FILE = "sword.glb"
 const LOG_STREAM = true
+const vertex_spheres_render_interval = 4  # render on every nth vertex is received
