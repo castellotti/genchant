@@ -8,8 +8,8 @@ var _transform : Transform3D
 
 
 # Add support for is_xr_class on XRTools classes
-func is_xr_class(name : String) -> bool:
-    return name == "ControlPadLocation"
+func is_xr_class(test : String) -> bool:
+    return test == "ControlPadLocation"
 
 
 # Called when the node enters the scene tree for the first time.
@@ -24,9 +24,9 @@ func _ready():
 
 
 # Handle world scale changing
-func _on_hand_scale_changed(scale : float) -> void:
+func _on_hand_scale_changed(new_scale : float) -> void:
     # Scale ourselves (and our children)
-    transform = _transform.scaled(Vector3.ONE * scale)
+    transform = _transform.scaled(Vector3.ONE * new_scale)
 
 
 ## Find a ControlPadLocation related to the specified node
