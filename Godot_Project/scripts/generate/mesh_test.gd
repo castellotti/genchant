@@ -61,20 +61,44 @@ func _run_tests(test_files: Dictionary) -> void:
     if test_files.glb_file:
         _test_glb_mesh(test_files.glb_file)
 
-func _test_stream_mesh(log_file: String) -> void:
-    var content = _read_file_content(log_file)
-    if content.is_empty():
+func _test_stream_mesh(file_path: String) -> void:
+    if not FileAccess.file_exists(file_path):
+        push_error("File not found: " + file_path)
         return
         
-    var metadata = MeshMetadata.parse_from_log(content)
+    var metadata: MeshMetadata
+    if file_path.to_lower().ends_with(".json"):
+        metadata = MeshMetadata.load_from_file(file_path)
+        if metadata == null:
+            push_error("Failed to load metadata from JSON file: " + file_path)
+            return
+    else:
+        # Assume it's a log file
+        var content = _read_file_content(file_path)
+        if content.is_empty():
+            return
+        metadata = MeshMetadata.parse_from_log(content)
+        
     _process_mesh_data(metadata, _stream_mesh_visualizer, true)
 
-func _test_final_mesh(log_file: String) -> void:
-    var content = _read_file_content(log_file)
-    if content.is_empty():
+func _test_final_mesh(file_path: String) -> void:
+    if not FileAccess.file_exists(file_path):
+        push_error("File not found: " + file_path)
         return
         
-    var metadata = MeshMetadata.parse_from_log(content)
+    var metadata: MeshMetadata
+    if file_path.to_lower().ends_with(".json"):
+        metadata = MeshMetadata.load_from_file(file_path)
+        if metadata == null:
+            push_error("Failed to load metadata from JSON file: " + file_path)
+            return
+    else:
+        # Assume it's a log file
+        var content = _read_file_content(file_path)
+        if content.is_empty():
+            return
+        metadata = MeshMetadata.parse_from_log(content)
+        
     _process_mesh_data(metadata, _final_mesh_visualizer, false)
 
 func _test_glb_mesh(glb_file: String) -> void:

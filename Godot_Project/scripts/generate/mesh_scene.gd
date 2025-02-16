@@ -2,7 +2,6 @@ extends Node3D
 
 @onready var mesh_visualizer: MeshVisualizer
 
-const DEFAULT_PROMPT = "Create a 3D model of a sword"
 var is_generating := false
 var generation_succeeded := false
 
@@ -21,7 +20,7 @@ func generate() -> void:
         
     is_generating = true
     generation_succeeded = false
-    mesh_visualizer.generate(DEFAULT_PROMPT)
+    mesh_visualizer.generate(Globals.PROMPT)
     await mesh_visualizer._mesh_generator.generation_complete
     generation_succeeded = not is_generating  # Only set success if we weren't interrupted
     is_generating = false
