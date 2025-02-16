@@ -54,7 +54,8 @@ func _ready():
     update_joystick_touch_pad(Globals.joystick_touch_pad_enabled)
 
     # Initialize visualizations after environment interface is established
-    initialize_visualizations()
+    if Globals.enable_visualizations:
+        initialize_visualizations()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
@@ -173,8 +174,8 @@ func initialize_visualizations() -> void:
             # Godot Vision does not currently support shaders
             visualizations_scene.show_visualization("matrix_3d_rain")
 
-            #visualizations_scene.show_visualization("matrix_background")
-            #visualizations_scene.show_visualization("matrix_domain")
+            visualizations_scene.show_visualization("matrix_background")
+            visualizations_scene.show_visualization("matrix_domain")
 
             #visualizations_scene.show_visualization("left")
             #visualizations_scene.show_visualization("right")

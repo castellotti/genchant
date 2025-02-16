@@ -1,15 +1,32 @@
 extends Node3D
 class_name MeshVisualizer
 
-const SPHERE_RADIUS = 0.25  # 25cm radius for vertex spheres
+const SPHERE_RADIUS = 0.8  # 80cm radius for vertex spheres
 const TARGET_SIZE = 1.0  # Target size in meters for the bounding cube
-const INITIAL_HEIGHT = 1.0  # Initial height off the floor in meters
+const INITIAL_HEIGHT = 0.5  # Initial height off the floor in meters
+
+# Position offsets for different visualization elements
+const VERTEX_SPHERES_OFFSET = Vector3(0, 1, 0)  # 1m above the base height
+const FINAL_MESH_OFFSET = Vector3.ZERO  # At the base height
+
+const VERTEX_SPHERES_BOUNDING_BOX = true
+const FINAL_MESH_BOUNDING_BOX = true
+
+# Transparency settings for bounding boxes (0.0 = fully transparent, 1.0 = fully opaque)
+const VERTEX_SPHERES_BOUNDING_BOX_ALPHA = 0.05
+const FINAL_MESH_BOUNDING_BOX_ALPHA = 0.2
+
+# Padding settings for bounding boxes (how much to extend beyond the mesh bounds)
+const VERTEX_SPHERES_BOUNDING_BOX_PADDING = SPHERE_RADIUS  # Extend by sphere radius to contain protruding spheres
+const FINAL_MESH_BOUNDING_BOX_PADDING = 0.0  # No padding for final mesh
 
 var _mesh_generator: MeshGenerator
 var _st := SurfaceTool.new()
+var _vertex_spheres_container: Node3D
 var _vertex_spheres: Array[MeshInstance3D] = []
 var _final_mesh: MeshInstance3D
-var _bounding_box: MeshInstance3D
+var _bounding_box_vertex_spheres: MeshInstance3D
+var _bounding_box_final_mesh: MeshInstance3D
 var _collision_shape: CollisionShape3D
 var _rigid_body: RigidBody3D
 var _current_vertices := PackedVector3Array()
@@ -19,9 +36,23 @@ var _scale_factor: float = 1.0
 var _total_vertices: int = 0
 
 func _ready() -> void:
+    # vertex spheres
+    _vertex_spheres_container = Node3D.new()
+    add_child(_vertex_spheres_container)
+    _vertex_spheres_container.position = VERTEX_SPHERES_OFFSET
+
+    if VERTEX_SPHERES_BOUNDING_BOX:    
+        _bounding_box_vertex_spheres = MeshInstance3D.new()
+        _vertex_spheres_container.add_child(_bounding_box_vertex_spheres)
+        var box_material = StandardMaterial3D.new()
+        box_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+        box_material.albedo_color = Color(1, 1, 1, VERTEX_SPHERES_BOUNDING_BOX_ALPHA)
+        _bounding_box_vertex_spheres.material_override = box_material
+
     # Create RigidBody3D as parent for final mesh
     _rigid_body = RigidBody3D.new()
     add_child(_rigid_body)
+    _rigid_body.position = FINAL_MESH_OFFSET
 
     # Set up collision shape
     _collision_shape = CollisionShape3D.new()
@@ -43,12 +74,13 @@ func _ready() -> void:
     _final_mesh.material_override = material
 
     # Create bounding box visualization
-    _bounding_box = MeshInstance3D.new()
-    _rigid_body.add_child(_bounding_box)
-    var box_material = StandardMaterial3D.new()
-    box_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    box_material.albedo_color = Color(1, 1, 1, 0.25)
-    _bounding_box.material_override = box_material
+    if FINAL_MESH_BOUNDING_BOX:
+        _bounding_box_final_mesh = MeshInstance3D.new()
+        _rigid_body.add_child(_bounding_box_final_mesh)
+        var box_material = StandardMaterial3D.new()
+        box_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+        box_material.albedo_color = Color(1, 1, 1, FINAL_MESH_BOUNDING_BOX_ALPHA)
+        _bounding_box_final_mesh.material_override = box_material
 
     # Set up mesh generator
     _mesh_generator = MeshGenerator.new()
@@ -82,14 +114,15 @@ func _clear_visualization() -> void:
 
     # Clear final mesh and bounds
     _final_mesh.mesh = null
-    _bounding_box.mesh = null
+    _bounding_box_vertex_spheres.mesh = null
+    _bounding_box_final_mesh.mesh = null
     if _collision_shape.shape:
         _collision_shape.shape = null
 
 func _add_vertex_sphere(new_position: Vector3) -> void:
     var sphere_mesh = SphereMesh.new()
-    sphere_mesh.radius = SPHERE_RADIUS
-    sphere_mesh.height = SPHERE_RADIUS * 2
+    sphere_mesh.radius = SPHERE_RADIUS * _scale_factor  # Scale the sphere radius
+    sphere_mesh.height = SPHERE_RADIUS * 2 * _scale_factor
 
     var sphere_instance = MeshInstance3D.new()
     sphere_instance.mesh = sphere_mesh
@@ -98,26 +131,46 @@ func _add_vertex_sphere(new_position: Vector3) -> void:
     material.albedo_color = Color.BLACK
     sphere_instance.material_override = material
 
-    sphere_instance.position = new_position
-    add_child(sphere_instance)
+    # Apply scaling and positioning
+    var scaled_pos = new_position * _scale_factor
+    sphere_instance.position = scaled_pos
+    _vertex_spheres_container.add_child(sphere_instance)  # Add to container instead of rigid body
     _vertex_spheres.append(sphere_instance)
 
 func _update_bounds_and_scale() -> void:
     if _current_vertices.is_empty():
         return
 
+    # Initialize bounds with first vertex if needed
     if _current_bounds.size == Vector3.ZERO:
         _current_bounds = AABB(_current_vertices[0], Vector3.ZERO)
 
+    # Update bounds with all vertices
     for vertex in _current_vertices:
         _current_bounds = _current_bounds.expand(vertex)
 
+    # Calculate scale factor to fit within target size
     var max_dimension = max(_current_bounds.size.x, max(_current_bounds.size.y, _current_bounds.size.z))
     _scale_factor = TARGET_SIZE / max_dimension if max_dimension > 0 else 1.0
+
+    # Position the rigid body at the initial height plus offset
+    _rigid_body.position = Vector3(0, INITIAL_HEIGHT, 0) + FINAL_MESH_OFFSET
+    _rigid_body.visible = true
+
+    # Update vertex spheres container position
+    _vertex_spheres_container.position = Vector3(0, INITIAL_HEIGHT, 0) + VERTEX_SPHERES_OFFSET
 
 func _on_mesh_update(vertices: PackedVector3Array, indices: PackedInt32Array) -> void:
     _current_vertices = vertices
     _current_indices = indices
+
+    # Update bounds and scale
+    _update_bounds_and_scale()
+    
+    # Update vertex spheres bounding box
+    if VERTEX_SPHERES_BOUNDING_BOX:
+        var scaled_bounds = AABB(_current_bounds.position * _scale_factor, _current_bounds.size * _scale_factor)
+        _update_bounding_box(_bounding_box_vertex_spheres, scaled_bounds)
 
     # Update vertex spheres
     if vertices.size() > _total_vertices:
@@ -125,9 +178,10 @@ func _on_mesh_update(vertices: PackedVector3Array, indices: PackedInt32Array) ->
             _add_vertex_sphere(vertices[i])
         _total_vertices = vertices.size()
 
+    # Update existing sphere positions
     for i in range(vertices.size()):
         if i < _vertex_spheres.size():
-            _vertex_spheres[i].position = vertices[i]
+            _vertex_spheres[i].position = vertices[i] * _scale_factor
 
     # Create streaming mesh with faces
     if not vertices.is_empty() and not indices.is_empty():
@@ -135,7 +189,7 @@ func _on_mesh_update(vertices: PackedVector3Array, indices: PackedInt32Array) ->
         _st.begin(Mesh.PRIMITIVE_TRIANGLES)
         
         for i in range(vertices.size()):
-            var vertex = vertices[i]
+            var vertex = vertices[i] * _scale_factor  # Scale vertices
             var y_normalized = 0.5  # Use a constant color during streaming
             var color = Color(y_normalized, 0.0, 1.0 - y_normalized, 1.0)
             _st.set_color(color)
@@ -180,14 +234,14 @@ func _update_final_mesh() -> void:
     # Update collision shape and bounding box
     var scaled_bounds = AABB(_current_bounds.position * _scale_factor, _current_bounds.size * _scale_factor)
     _update_collision_shape(scaled_bounds)
-    _update_bounding_box(scaled_bounds)
+    _update_bounding_box(_bounding_box_final_mesh, scaled_bounds)
 
-    # Reset position and show final mesh
-    _rigid_body.position.y = INITIAL_HEIGHT
+    # Ensure proper positioning with offset
+    _rigid_body.position = Vector3(0, INITIAL_HEIGHT, 0) + FINAL_MESH_OFFSET
     _rigid_body.freeze = false
     _rigid_body.visible = true
 
-func _update_bounding_box(bounds: AABB) -> void:
+func _update_bounding_box(_bounding_box: MeshInstance3D, bounds: AABB) -> void:
     var box_mesh = BoxMesh.new()
     box_mesh.size = bounds.size
     _bounding_box.mesh = box_mesh
@@ -211,4 +265,3 @@ func _on_generation_complete(success: bool) -> void:
             _vertex_spheres.clear()
     else:
         push_error("Mesh generation failed")
-        
