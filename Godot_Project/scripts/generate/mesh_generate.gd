@@ -17,6 +17,7 @@ var _total_vertices := 0
 var _total_faces := 0
 var _metadata: MeshMetadata  # New variable to store metadata
 var _generation_start_time: int  # Track generation start time
+const vertex_spheres_render_interval: int = 4  # render on every nth vertex is received
 
 func _init() -> void:
     _http_client = HTTPClient.new()
@@ -195,7 +196,7 @@ func _process_mesh_data(content: String) -> void:
                         _update_metadata_bounds()
 
                         # Update mesh every few vertices for visual feedback
-                        if _current_vertices.size() % Globals.vertex_spheres_render_interval == 0:
+                        if _current_vertices.size() % vertex_spheres_render_interval == 0:
                             mesh_update.emit(_current_vertices, _current_indices)
                 _number_buffer = ""
 
