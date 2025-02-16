@@ -26,13 +26,17 @@ const OLLAMA_HOST= "http://localhost:11434"
 const MODEL_NAME = "hf.co/bartowski/LLaMA-Mesh-GGUF:Q4_K_M"
 const TEMPERATURE = 0.95
 const MAX_TOKENS = 4096
-const TEST_LOG_FILE = "generate-verbose.log"
-const TEST_DEBUG_FILE = "generate-gdscript.log"
-const TEST_GLB_FILE = "sword.glb"
+const PROMPT = "Create a 3D model of a hammer"
 const LOG_STREAM = true
 
 const example_models: Dictionary = {
-   "res://assets/meshes/enchant/sword.json": Vector3(-1.5, 1.0, -2.0),  # left
-   "res://assets/meshes/enchant/sword.glb": Vector3(0, 1.0, -2.0),      # center
-   "res://assets/meshes/enchant/hammer.json": Vector3(1.5, 1.0, -2.0),  # right
+  "res://assets/meshes/enchant/sword.json": {
+     "position": Vector3(-1.5, 1.0, -2.0)  # left
+  },
+  "res://assets/meshes/enchant/sword.glb": {
+     "position": Vector3(0, 1.0, -2.0)     # center
+  },
+  "res://assets/meshes/enchant/hammer.json": {
+     "position": Vector3(1.5, 1.0, -2.0)   # right
+  }
 }

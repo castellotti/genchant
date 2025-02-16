@@ -244,6 +244,9 @@ func _update_collision_shape(bounds: AABB) -> void:
     _collision_shape.shape = box_shape
     _collision_shape.position = bounds.position + bounds.size * 0.5
 
+func update_metadata(new_metadata: MeshMetadata) -> void:
+    _metadata = new_metadata
+    
 func _on_generation_complete(success: bool) -> void:
     if success:
         print("Mesh generation complete - Creating final mesh")
@@ -253,11 +256,15 @@ func _on_generation_complete(success: bool) -> void:
         if Globals.DEBUG:
             print("metadata:")
             print(_metadata.to_json_string())
-        
-        # Only remove vertex spheres after final mesh is created
-        if not Globals.DEBUG:
+
+        # Only remove vertex spheres after final mesh is created if retain_vertex_spheres is false
+        if not _metadata.retain_vertex_spheres:
             for sphere in _vertex_spheres:
                 sphere.queue_free()
             _vertex_spheres.clear()
+
+            # Also hide the vertex spheres bounding box
+            if _bounding_box_vertex_spheres:
+                _bounding_box_vertex_spheres.visible = false
     else:
         push_error("Mesh generation failed")

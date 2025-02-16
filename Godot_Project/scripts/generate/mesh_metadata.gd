@@ -5,6 +5,7 @@ extends RefCounted
 var sphere_radius: float = 0.8  # 80cm radius for vertex spheres
 var target_size: float = 1.0  # Target size in meters for the bounding cube
 var initial_height: float = 0  # Initial height off the floor in meters
+var retain_vertex_spheres: bool = false  # Whether to keep vertex spheres after generation
 
 # Position offsets - Adjusted to be closer to player's origin at (0, 0, 9)
 var vertex_spheres_offset: Vector3 = Vector3(-target_size/2, target_size/2, 8 - target_size/2)
@@ -22,8 +23,8 @@ var final_mesh_bounding_box_padding: float = 0.1
 # Generation metadata
 var model: String = ""
 var prompt: String = ""
-var temperature: float = 0.0
-var max_tokens: int = 0
+var temperature: float = Globals.TEMPERATURE
+var max_tokens: int = Globals.MAX_TOKENS
 var backend: String = ""
 var generation_time_ms: int = 0  # Time taken to generate the mesh
 var generation_timestamp: int = 0  # Unix timestamp when generation started
@@ -46,6 +47,7 @@ func to_dict() -> Dictionary:
             "sphere_radius": sphere_radius,
             "target_size": target_size,
             "initial_height": initial_height,
+            "retain_vertex_spheres": retain_vertex_spheres,
             "vertex_spheres_offset": {
                 "x": vertex_spheres_offset.x,
                 "y": vertex_spheres_offset.y,
@@ -114,6 +116,7 @@ static func from_dict(data: Dictionary) -> MeshMetadata:
     metadata.sphere_radius = viz.get("sphere_radius", 0.8)
     metadata.target_size = viz.get("target_size", 1.0)
     metadata.initial_height = viz.get("initial_height", 0.5)
+    metadata.retain_vertex_spheres = viz.get("retain_vertex_spheres", false)
     
     var spheres_offset = viz.get("vertex_spheres_offset", {})
     metadata.vertex_spheres_offset = Vector3(

@@ -26,7 +26,7 @@ func _setup_visualizers() -> void:
             visualizer = MeshVisualizer.new()
             
         add_child(visualizer)
-        visualizer.position += Globals.example_models[file_path]
+        visualizer.position += Globals.example_models[file_path]["position"]
         _visualizers[file_path] = visualizer
 
 func _load_models() -> void:
@@ -75,6 +75,9 @@ func _process_mesh_data(metadata: MeshMetadata, visualizer: MeshVisualizer) -> v
     if metadata.vertices.is_empty():
         return
 
+    # Update the visualizer's metadata first
+    visualizer.update_metadata(metadata)
+    
     # Send complete mesh at once
     visualizer._on_mesh_update(metadata.vertices, metadata.indices)
     visualizer._on_generation_complete(true)
