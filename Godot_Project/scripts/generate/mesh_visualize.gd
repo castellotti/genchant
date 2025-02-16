@@ -11,11 +11,12 @@ var _bounding_box_final_mesh: MeshInstance3D
 var _collision_shape: CollisionShape3D
 var _rigid_body: RigidBody3D
 var _total_vertices: int = 0
+var _grab_point_manager: GrabPointManager
 var _metadata: MeshMetadata
 
 func _ready() -> void:
     _metadata = MeshMetadata.new()
-    
+
     # vertex spheres
     _vertex_spheres_container = Node3D.new()
     add_child(_vertex_spheres_container)
@@ -52,6 +53,10 @@ func _ready() -> void:
     material.vertex_color_use_as_albedo = true
     material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_VERTEX
     _final_mesh.material_override = material
+
+    # Add ability to grab
+    _grab_point_manager = GrabPointManager.new(_rigid_body)
+    add_child(_grab_point_manager)
 
     # Create bounding box visualization
     if _metadata.final_mesh_bounding_box_enabled:
@@ -90,6 +95,9 @@ func _clear_visualization() -> void:
     for sphere in _vertex_spheres:
         sphere.queue_free()
     _vertex_spheres.clear()
+
+    if _grab_point_manager:
+        _grab_point_manager.clear_grab_points()
 
     # Clear final mesh and bounds
     _final_mesh.mesh = null
@@ -224,6 +232,9 @@ func _update_mesh(streaming: bool = false) -> void:
     _final_mesh.mesh = _st.commit()
 
     if not streaming:
+        # Update grab points
+        _grab_point_manager.setup_grab_points(_metadata.bounds, _metadata.scale_factor)
+
         # Update collision shape and bounding box with centered bounds
         var scaled_bounds = AABB(-(_metadata.bounds.size * _metadata.scale_factor) / 2, 
                                _metadata.bounds.size * _metadata.scale_factor)

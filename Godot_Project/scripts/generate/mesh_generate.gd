@@ -17,7 +17,7 @@ var _total_vertices := 0
 var _total_faces := 0
 var _metadata: MeshMetadata  # New variable to store metadata
 var _generation_start_time: int  # Track generation start time
-const vertex_spheres_render_interval: int = 4  # render on every nth vertex is received
+const vertex_spheres_render_interval: int = 1  # render on every nth vertex is received
 
 func _init() -> void:
     _http_client = HTTPClient.new()
@@ -41,12 +41,12 @@ func generate_mesh(prompt: String) -> void:
         print("Using model: " + Globals.MODEL_NAME)
         print("Generating mesh using MeshGenerator")
 
-    var host = Globals.OLLAMA_HOST.split("://")[1]
+    var host = Globals.RENDER_HOST.split("://")[1]
     var port = host.split(":")[1].to_int()
     host = host.split(":")[0]
     var err = _http_client.connect_to_host(host, port)
     if err != OK:
-        push_error("Failed to connect to Ollama server")
+        push_error("Failed to connect to server")
         generation_complete.emit(false)
         return
     

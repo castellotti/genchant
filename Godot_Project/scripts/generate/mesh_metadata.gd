@@ -10,8 +10,8 @@ var retain_vertex_spheres_bounding_box: bool = false  # Whether to keep vertex s
 var retain_final_mesh_bounding_box: bool = false  # Whether to keep final mesh bounding box after generation
 
 # Position offsets - Adjusted to be closer to player's origin at (0, 0, 9)
-var vertex_spheres_offset: Vector3 = Vector3(-target_size/2, target_size/2, 8 - target_size/2)
-var final_mesh_offset: Vector3 = Vector3(0, 0, 8)
+var vertex_spheres_offset: Vector3 = Vector3(-target_size/2, target_size/2, 10 - target_size/2)
+var final_mesh_offset: Vector3 = Vector3(0, 0, 10)
 
 # Bounding box settings
 var vertex_spheres_bounding_box_enabled: bool = true

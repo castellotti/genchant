@@ -174,13 +174,13 @@ func initialize_visualizations() -> void:
             # Godot Vision does not currently support shaders
             visualizations_scene.show_visualization("matrix_3d_rain")
 
-            visualizations_scene.show_visualization("matrix_background")
-            visualizations_scene.show_visualization("matrix_domain")
+            #visualizations_scene.show_visualization("matrix_background")
+            #visualizations_scene.show_visualization("matrix_domain")
 
             #visualizations_scene.show_visualization("left")
             #visualizations_scene.show_visualization("right")
             #visualizations_scene.show_visualization("top")
 
-        else:
-            visualizations_scene.show_visualization("bar_chart_raw")
-            visualizations_scene.show_visualization("bar_chart_remote")
+        #else:
+            #visualizations_scene.show_visualization("bar_chart_raw")
+            #visualizations_scene.show_visualization("bar_chart_remote")
