@@ -6,6 +6,8 @@ var sphere_radius: float = 0.8  # 80cm radius for vertex spheres
 var target_size: float = 1.0  # Target size in meters for the bounding cube
 var initial_height: float = 0  # Initial height off the floor in meters
 var retain_vertex_spheres: bool = false  # Whether to keep vertex spheres after generation
+var retain_vertex_spheres_bounding_box: bool = false  # Whether to keep vertex spheres bounding box after generation
+var retain_final_mesh_bounding_box: bool = false  # Whether to keep final mesh bounding box after generation
 
 # Position offsets - Adjusted to be closer to player's origin at (0, 0, 9)
 var vertex_spheres_offset: Vector3 = Vector3(-target_size/2, target_size/2, 8 - target_size/2)
@@ -47,7 +49,6 @@ func to_dict() -> Dictionary:
             "sphere_radius": sphere_radius,
             "target_size": target_size,
             "initial_height": initial_height,
-            "retain_vertex_spheres": retain_vertex_spheres,
             "vertex_spheres_offset": {
                 "x": vertex_spheres_offset.x,
                 "y": vertex_spheres_offset.y,
@@ -57,7 +58,10 @@ func to_dict() -> Dictionary:
                 "x": final_mesh_offset.x,
                 "y": final_mesh_offset.y,
                 "z": final_mesh_offset.z
-            }
+            },
+            "retain_vertex_spheres": retain_vertex_spheres,
+            "retain_vertex_spheres_bounding_box": retain_vertex_spheres_bounding_box,
+            "retain_final_mesh_bounding_box": retain_final_mesh_bounding_box
         },
         "bounding_box_settings": {
             "vertex_spheres_enabled": vertex_spheres_bounding_box_enabled,
@@ -117,6 +121,8 @@ static func from_dict(data: Dictionary) -> MeshMetadata:
     metadata.target_size = viz.get("target_size", 1.0)
     metadata.initial_height = viz.get("initial_height", 0.5)
     metadata.retain_vertex_spheres = viz.get("retain_vertex_spheres", false)
+    metadata.retain_vertex_spheres_bounding_box = viz.get("retain_vertex_spheres_bounding_box", true)
+    metadata.retain_final_mesh_bounding_box = viz.get("retain_final_mesh_bounding_box", false)
     
     var spheres_offset = viz.get("vertex_spheres_offset", {})
     metadata.vertex_spheres_offset = Vector3(

@@ -247,6 +247,7 @@ func _update_collision_shape(bounds: AABB) -> void:
 func update_metadata(new_metadata: MeshMetadata) -> void:
     _metadata = new_metadata
     
+# In mesh_visualizer.gd, update _on_generation_complete():
 func _on_generation_complete(success: bool) -> void:
     if success:
         print("Mesh generation complete - Creating final mesh")
@@ -257,14 +258,18 @@ func _on_generation_complete(success: bool) -> void:
             print("metadata:")
             print(_metadata.to_json_string())
 
-        # Only remove vertex spheres after final mesh is created if retain_vertex_spheres is false
+        # Only remove vertex spheres and their bounding box if retain settings are false
         if not _metadata.retain_vertex_spheres:
             for sphere in _vertex_spheres:
                 sphere.queue_free()
             _vertex_spheres.clear()
 
-            # Also hide the vertex spheres bounding box
-            if _bounding_box_vertex_spheres:
-                _bounding_box_vertex_spheres.visible = false
+        # Hide vertex spheres bounding box if retention is disabled
+        if _bounding_box_vertex_spheres and not _metadata.retain_vertex_spheres_bounding_box:
+            _bounding_box_vertex_spheres.visible = false
+                
+        # Hide final mesh bounding box if retention is disabled
+        if _bounding_box_final_mesh and not _metadata.retain_final_mesh_bounding_box:
+            _bounding_box_final_mesh.visible = false
     else:
         push_error("Mesh generation failed")

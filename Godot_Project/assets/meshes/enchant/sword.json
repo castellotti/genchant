@@ -490,11 +490,13 @@
     "initial_height": 0,
     "sphere_radius": 0.8,
     "target_size": 1,
-    "retain_vertex_spheres": true,
     "vertex_spheres_offset": {
       "x": -0.5,
       "y": 0.5,
       "z": 7.5
-    }
+    },
+    "retain_vertex_spheres": true,
+    "retain_vertex_spheres_bounding_box": true,
+    "retain_final_mesh_bounding_box": true
   }
 }
