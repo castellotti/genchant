@@ -109,7 +109,9 @@ Here is the 3D mesh in .obj format:",
         _update_metadata_bounds()
         mesh_update.emit(_current_vertices, _current_indices)
 
-        if Globals.LOG_STREAM:
+        # If debug mode is enabled and we have not already 
+        # displayed the content of the mesh during streaming
+        if Globals.DEBUG and not Globals.LOG_STREAM:
             print("\nMesh content:")
             # Print all vertices
             for i in range(_current_vertices.size()):
@@ -120,8 +122,8 @@ Here is the 3D mesh in .obj format:",
             for i in range(0, _current_indices.size(), 3):
                 print("f %d %d %d" % [_current_indices[i] + 1, _current_indices[i + 1] + 1, _current_indices[i + 2] + 1])
 
-            print("\nNumber of vertices: " + str(_total_vertices))
-            print("Number of faces: " + str(_total_faces))
+        print("\nNumber of vertices: " + str(_total_vertices))
+        print("Number of faces: " + str(_total_faces))
 
     _http_client.close()
     generation_complete.emit(true)
