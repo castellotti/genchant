@@ -22,7 +22,7 @@ var server_port_tcp: int = 443
 var server_port_udp: int = 8192
 
 # Generate
-const OLLAMA_HOST= "http://localhost:11434"
+const RENDER_HOST= "http://localhost:11434"
 const MODEL_NAME = "hf.co/bartowski/LLaMA-Mesh-GGUF:Q4_K_M"
 const TEMPERATURE = 0.95
 const MAX_TOKENS = 4096
