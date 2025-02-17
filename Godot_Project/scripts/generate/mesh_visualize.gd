@@ -35,15 +35,15 @@ func _ready() -> void:
     add_child(_rigid_body)
     _rigid_body.position = _metadata.final_mesh_offset
 
-    # Set up collision shape
-    _collision_shape = CollisionShape3D.new()
-    _rigid_body.add_child(_collision_shape)
-
     # Configure physics properties
     _rigid_body.mass = 1.0
     _rigid_body.physics_material_override = PhysicsMaterial.new()
     _rigid_body.physics_material_override.bounce = 0.3
     _rigid_body.physics_material_override.friction = 0.8
+
+    # Set up collision shape
+    _collision_shape = CollisionShape3D.new()
+    _rigid_body.add_child(_collision_shape)
 
     # Create final mesh instance
     _final_mesh = MeshInstance3D.new()

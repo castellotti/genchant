@@ -22,11 +22,11 @@ var server_port_tcp: int = 443
 var server_port_udp: int = 8192
 
 # Generate
-const RENDER_HOST= "http://localhost:11434"
-const MODEL_NAME = "hf.co/bartowski/LLaMA-Mesh-GGUF:Q4_K_M"
-const TEMPERATURE = 0.95
-const MAX_TOKENS = 4096
-const PROMPT = "Create a 3D model of a sword"
+var RENDER_HOST= "http://localhost:11434"
+var MODEL_NAME = "hf.co/bartowski/LLaMA-Mesh-GGUF:Q4_K_M"
+var TEMPERATURE = 0.95
+var MAX_TOKENS = 4096
+var PROMPT = "Create a 3D model of a sword"
 const LOG_STREAM = true
 
 const example_models: Dictionary = {
