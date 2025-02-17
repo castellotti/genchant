@@ -6,7 +6,7 @@ var is_running_in_visionos: bool = OS.get_name() == "iOS" and OS.get_environment
 var is_running_in_web: bool = OS.get_name() == "Web" or OS.get_name() == "HTML5"
 var joystick_touch_pad_enabled: bool = false
 var passthrough_enabled: bool = false
-var enable_visualizations: bool = false
+var enable_visualizations: bool = true
 
 # UI
 var mesh_scene : Node3D

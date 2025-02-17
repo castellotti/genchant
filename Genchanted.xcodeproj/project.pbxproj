@@ -16,7 +16,7 @@
 		DE54EABD2B3C75D600594A05 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE54EABC2B3C75D600594A05 /* Preview Assets.xcassets */; };
 		DE897A0F2CB93B31003265C7 /* RealityKitToolbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE897A0E2CB93B2F003265C7 /* RealityKitToolbox.swift */; };
 		DE897A112CB93C54003265C7 /* HandTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE897A102CB93C52003265C7 /* HandTracking.swift */; };
-		DEEA88FC2CB40AF200A8CD7D /* StyxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEA88FB2CB40AF200A8CD7D /* StyxApp.swift */; };
+		DEEA88FC2CB40AF200A8CD7D /* GenchantedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEA88FB2CB40AF200A8CD7D /* GenchantedApp.swift */; };
 		DEF34D782CCF886F009B8A49 /* Godot_Project in Resources */ = {isa = PBXBuildFile; fileRef = DEF34D772CCF886B009B8A49 /* Godot_Project */; };
 /* End PBXBuildFile section */
 
@@ -35,13 +35,13 @@
 /* Begin PBXFileReference section */
 		DE054E0E2CB954A200D7F4C8 /* GodotInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GodotInput.swift; sourceTree = "<group>"; };
 		DE054E122CB956F200D7F4C8 /* ScenePhaseWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePhaseWatcher.swift; sourceTree = "<group>"; };
-		DE54EAAC2B3C75D500594A05 /* Styx.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Styx.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE54EAAC2B3C75D500594A05 /* Genchanted.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Genchanted.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE54EAB92B3C75D600594A05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DE54EABC2B3C75D600594A05 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DE54EABE2B3C75D600594A05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DE897A0E2CB93B2F003265C7 /* RealityKitToolbox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealityKitToolbox.swift; sourceTree = "<group>"; };
 		DE897A102CB93C52003265C7 /* HandTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandTracking.swift; sourceTree = "<group>"; };
-		DEEA88FB2CB40AF200A8CD7D /* StyxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyxApp.swift; sourceTree = "<group>"; };
+		DEEA88FB2CB40AF200A8CD7D /* GenchantedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenchantedApp.swift; sourceTree = "<group>"; };
 		DEF34D772CCF886B009B8A49 /* Godot_Project */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Godot_Project; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,7 +68,7 @@
 			isa = PBXGroup;
 			children = (
 				DEF34D772CCF886B009B8A49 /* Godot_Project */,
-				DE54EAAE2B3C75D500594A05 /* Styx */,
+				DE54EAAE2B3C75D500594A05 /* Genchanted */,
 				DE54EAAD2B3C75D500594A05 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,23 +76,23 @@
 		DE54EAAD2B3C75D500594A05 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DE54EAAC2B3C75D500594A05 /* Styx.app */,
+				DE54EAAC2B3C75D500594A05 /* Genchanted.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DE54EAAE2B3C75D500594A05 /* Styx */ = {
+		DE54EAAE2B3C75D500594A05 /* Genchanted */ = {
 			isa = PBXGroup;
 			children = (
 				DE897A0D2CB93B29003265C7 /* Utilities */,
 				DE897A0C2CB93B1B003265C7 /* Views */,
 				DE897A082CB93AAE003265C7 /* Controls */,
-				DEEA88FB2CB40AF200A8CD7D /* StyxApp.swift */,
+				DEEA88FB2CB40AF200A8CD7D /* GenchantedApp.swift */,
 				DE54EAB92B3C75D600594A05 /* Assets.xcassets */,
 				DE54EABE2B3C75D600594A05 /* Info.plist */,
 				DE54EABB2B3C75D600594A05 /* Preview Content */,
 			);
-			path = Styx;
+			path = Genchanted;
 			sourceTree = "<group>";
 		};
 		DE54EABB2B3C75D600594A05 /* Preview Content */ = {
@@ -117,9 +117,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DE54EAAB2B3C75D500594A05 /* Styx */ = {
+		DE54EAAB2B3C75D500594A05 /* Genchanted */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DE54EAC12B3C75D600594A05 /* Build configuration list for PBXNativeTarget "Styx" */;
+			buildConfigurationList = DE54EAC12B3C75D600594A05 /* Build configuration list for PBXNativeTarget "Genchanted" */;
 			buildPhases = (
 				DE54EAA82B3C75D500594A05 /* Sources */,
 				DE54EAA92B3C75D500594A05 /* Frameworks */,
@@ -136,14 +136,14 @@
 				DE897A082CB93AAE003265C7 /* Controls */,
 				DE897A0C2CB93B1B003265C7 /* Views */,
 			);
-			name = Styx;
+			name = Genchanted;
 			packageProductDependencies = (
 				5249F06C2D1DDA720011D136 /* GodotVision */,
 				52C68FCE2D1F4B850056A16A /* SwiftGodotKit */,
 				52C68FD12D1F4B970056A16A /* GodotVision */,
 			);
 			productName = GodotVisionExample;
-			productReference = DE54EAAC2B3C75D500594A05 /* Styx.app */;
+			productReference = DE54EAAC2B3C75D500594A05 /* Genchanted.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -162,7 +162,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DE54EAA72B3C75D500594A05 /* Build configuration list for PBXProject "Styx" */;
+			buildConfigurationList = DE54EAA72B3C75D500594A05 /* Build configuration list for PBXProject "Genchanted" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -180,7 +180,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DE54EAAB2B3C75D500594A05 /* Styx */,
+				DE54EAAB2B3C75D500594A05 /* Genchanted */,
 			);
 		};
 /* End PBXProject section */
@@ -229,7 +229,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DE897A0F2CB93B31003265C7 /* RealityKitToolbox.swift in Sources */,
-				DEEA88FC2CB40AF200A8CD7D /* StyxApp.swift in Sources */,
+				DEEA88FC2CB40AF200A8CD7D /* GenchantedApp.swift in Sources */,
 				DE897A112CB93C54003265C7 /* HandTracking.swift in Sources */,
 				DE054E0F2CB954A500D7F4C8 /* GodotInput.swift in Sources */,
 				DE054E132CB956F500D7F4C8 /* ScenePhaseWatcher.swift in Sources */,
@@ -375,7 +375,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_ASSET_PATHS = "\"Styx/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Genchanted/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -393,7 +393,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Styx;
+				INFOPLIST_KEY_CFBundleDisplayName = Genchanted;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -401,7 +401,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "studio.jigsaw.styx-godot";
+				PRODUCT_BUNDLE_IDENTIFIER = studio.jigsaw.genchanted;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -422,7 +422,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_ASSET_PATHS = "\"Styx/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Genchanted/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -433,7 +433,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(TARGET_NAME)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Styx;
+				INFOPLIST_KEY_CFBundleDisplayName = Genchanted;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -441,7 +441,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "studio.jigsaw.styx-godot";
+				PRODUCT_BUNDLE_IDENTIFIER = studio.jigsaw.genchanted;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -455,7 +455,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DE54EAA72B3C75D500594A05 /* Build configuration list for PBXProject "Styx" */ = {
+		DE54EAA72B3C75D500594A05 /* Build configuration list for PBXProject "Genchanted" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DE54EABF2B3C75D600594A05 /* Debug */,
@@ -464,7 +464,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DE54EAC12B3C75D600594A05 /* Build configuration list for PBXNativeTarget "Styx" */ = {
+		DE54EAC12B3C75D600594A05 /* Build configuration list for PBXNativeTarget "Genchanted" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DE54EAC22B3C75D600594A05 /* Debug */,

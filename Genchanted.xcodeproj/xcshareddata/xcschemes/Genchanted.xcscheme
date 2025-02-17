@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DE54EAAB2B3C75D500594A05"
-               BuildableName = "Styx.app"
-               BlueprintName = "Styx"
-               ReferencedContainer = "container:Styx.xcodeproj">
+               BuildableName = "Genchanted.app"
+               BlueprintName = "Genchanted"
+               ReferencedContainer = "container:Genchanted.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,9 +45,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DE54EAAB2B3C75D500594A05"
-            BuildableName = "Styx.app"
-            BlueprintName = "Styx"
-            ReferencedContainer = "container:Styx.xcodeproj">
+            BuildableName = "Genchanted.app"
+            BlueprintName = "Genchanted"
+            ReferencedContainer = "container:Genchanted.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -57,16 +57,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "DE54EAAB2B3C75D500594A05"
-            BuildableName = "Styx.app"
-            BlueprintName = "Styx"
-            ReferencedContainer = "container:Styx.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

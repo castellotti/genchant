@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://yanr42fvrgto"
-path="res://.godot/imported/styx.png-610dedb19fa6bd26f1eff88c7e3a101c.ctex"
+uid="uid://c33sndrckvurp"
+path="res://.godot/imported/genchanted.png-ccd679c762dcdf703a754446ad7c957f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/godot/styx.png"
-dest_files=["res://.godot/imported/styx.png-610dedb19fa6bd26f1eff88c7e3a101c.ctex"]
+source_file="res://assets/icons/godot/genchanted.png"
+dest_files=["res://.godot/imported/genchanted.png-ccd679c762dcdf703a754446ad7c957f.ctex"]
 
 [params]
 

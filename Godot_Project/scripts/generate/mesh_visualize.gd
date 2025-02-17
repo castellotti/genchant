@@ -274,6 +274,7 @@ func _on_generation_complete(success: bool) -> void:
             for sphere in _vertex_spheres:
                 sphere.queue_free()
             _vertex_spheres.clear()
+            _bounding_box_vertex_spheres.visible = false
 
         # Hide vertex spheres bounding box if retention is disabled
         if _bounding_box_vertex_spheres and not _metadata.retain_vertex_spheres_bounding_box:

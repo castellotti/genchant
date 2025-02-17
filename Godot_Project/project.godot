@@ -10,10 +10,10 @@ config_version=5
 
 [application]
 
-config/name="Styx"
+config/name="Genchanted"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
-config/icon="res://assets/icons/godot/styx.png"
+config/icon="res://assets/icons/godot/genchanted.png"
 
 [autoload]
 

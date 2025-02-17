@@ -1,8 +1,9 @@
 //
-//  StyxApp.swift
-//  Styx
+//  GenchantedApp.swift
+//  Genchanted
 //
-//  Created by Steve Castellotti on 9/4/24.
+//  Created by Steve Castellotti on 2/14/24.
+//  derivative work based on styx-godot by Steve Castellotti
 //  portions based on work by Kevin Watters
 //
 // Copyright (c) 2024-2025 Steve Castellotti
@@ -24,7 +25,7 @@ struct WindowGroupIds {
 }
 
 @main
-struct StyxApp: App {
+struct GenchantedApp: App {
     @StateObject private var godotVision = GodotVisionCoordinator()
     @StateObject private var handTracking = HandTracking()
     
