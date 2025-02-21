@@ -81,9 +81,9 @@ theme_override_font_sizes/font_size = 12
 layout_mode = 2
 alignment = 2
 
-[node name="ClearButton" type="Button" parent="Container/Footer"]
+[node name="GenerateButton" type="Button" parent="Container/Footer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "Generate"
 
-[connection signal="pressed" from="Container/Footer/ClearButton" to="." method="_on_ClearButton_pressed"]
+[connection signal="pressed" from="Container/Footer/GenerateButton" to="." method="_on_generate_button_pressed"]

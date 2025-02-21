@@ -22,7 +22,7 @@ func _ready() -> void:
     add_child(_vertex_spheres_container)
     _vertex_spheres_container.position = Vector3(_metadata.vertex_spheres_offset.x, 0, _metadata.vertex_spheres_offset.z)
 
-    if _metadata.vertex_spheres_bounding_box_enabled:    
+    if _metadata.vertex_spheres_bounding_box_enabled:
         _bounding_box_vertex_spheres = MeshInstance3D.new()
         _vertex_spheres_container.add_child(_bounding_box_vertex_spheres)
         var box_material = StandardMaterial3D.new()
@@ -134,14 +134,14 @@ func _update_bounds_and_scale() -> void:
         return
 
     # Calculate scale factor
-    var max_dimension = max(_metadata.bounds.size.x, 
-                          max(_metadata.bounds.size.y, _metadata.bounds.size.z))
+    var max_dimension = max(_metadata.bounds.size.x,
+                        max(_metadata.bounds.size.y, _metadata.bounds.size.z))
     var new_scale_factor = _metadata.target_size / max_dimension if max_dimension > 0 else 1.0
-    
+
     # Only update if scale factor has changed
     if new_scale_factor != _metadata.scale_factor:
         _metadata.scale_factor = new_scale_factor
-        
+
         # Update all existing vertex spheres with new scale
         for i in range(_vertex_spheres.size()):
             var sphere = _vertex_spheres[i]
@@ -172,14 +172,14 @@ func _on_mesh_update(vertices: PackedVector3Array, indices: PackedInt32Array) ->
             _metadata.bounds = AABB(vertices[0], Vector3.ZERO)
         for vertex in vertices:
             _metadata.bounds = _metadata.bounds.expand(vertex)
-    
+
     # Update scale and positioning
     _update_bounds_and_scale()
-    
+
     # Update vertex spheres bounding box with scaled padding
     if _metadata.vertex_spheres_bounding_box_enabled and _bounding_box_vertex_spheres:
-        var scaled_bounds = AABB(_metadata.bounds.position * _metadata.scale_factor, 
-                               _metadata.bounds.size * _metadata.scale_factor)
+        var scaled_bounds = AABB(_metadata.bounds.position * _metadata.scale_factor,
+                                 _metadata.bounds.size * _metadata.scale_factor)
         # Apply padding scaled by the same factor as the mesh
         var scaled_padding = _metadata.vertex_spheres_bounding_box_padding * _metadata.scale_factor
         scaled_bounds = scaled_bounds.grow(scaled_padding)
@@ -209,7 +209,7 @@ func _update_mesh(streaming: bool = false) -> void:
 
     # Center vertices around origin
     var center_offset = _metadata.bounds.position + (_metadata.bounds.size / 2)
-    
+
     # Add vertices with height-based coloring
     for vertex in _metadata.vertices:
         var centered_vertex = vertex - center_offset
@@ -242,7 +242,7 @@ func _update_mesh(streaming: bool = false) -> void:
 
         # Start frozen, then enable physics after a short delay
         _rigid_body.freeze = true
-    
+
         # Use a timer to unfreeze after a short delay
         var timer = get_tree().create_timer(0.2)
         timer.timeout.connect(func(): _rigid_body.freeze = false)
@@ -251,8 +251,8 @@ func _update_mesh(streaming: bool = false) -> void:
         _grab_point_manager.setup_grab_points(_metadata.bounds, _metadata.scale_factor)
 
         # Update collision shape and bounding box with centered bounds
-        var scaled_bounds = AABB(-(_metadata.bounds.size * _metadata.scale_factor) / 2, 
-                               _metadata.bounds.size * _metadata.scale_factor)
+        var scaled_bounds = AABB(-(_metadata.bounds.size * _metadata.scale_factor) / 2,
+                                   _metadata.bounds.size * _metadata.scale_factor)
         scaled_bounds = scaled_bounds.grow(_metadata.final_mesh_bounding_box_padding)
         _update_collision_shape(scaled_bounds)
         if _metadata.final_mesh_bounding_box_enabled and _bounding_box_final_mesh:
@@ -272,14 +272,13 @@ func _update_collision_shape(bounds: AABB) -> void:
 
 func update_metadata(new_metadata: MeshMetadata) -> void:
     _metadata = new_metadata
-    
-# In mesh_visualizer.gd, update _on_generation_complete():
+
 func _on_generation_complete(success: bool) -> void:
     if success:
         print("Mesh generation complete - Creating final mesh")
         _metadata.generation_time_ms = (Time.get_unix_time_from_system() - _metadata.generation_timestamp) * 1000
         _update_mesh(false)  # false for final mesh
-        
+
         if Globals.DEBUG:
             print("metadata:")
             print(_metadata.to_json_string())
@@ -294,7 +293,7 @@ func _on_generation_complete(success: bool) -> void:
         # Hide vertex spheres bounding box if retention is disabled
         if _bounding_box_vertex_spheres and not _metadata.retain_vertex_spheres_bounding_box:
             _bounding_box_vertex_spheres.visible = false
-                
+
         # Hide final mesh bounding box if retention is disabled
         if _bounding_box_final_mesh and not _metadata.retain_final_mesh_bounding_box:
             _bounding_box_final_mesh.visible = false

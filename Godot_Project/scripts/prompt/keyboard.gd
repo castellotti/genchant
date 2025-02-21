@@ -15,7 +15,7 @@ func _ready():
     temperature_edit.text = str(Globals.TEMPERATURE)  # Convert float to string
     prompt_edit.text = Globals.PROMPT
 
-func _on_ClearButton_pressed():
+func _on_generate_button_pressed():
     Globals.RENDER_HOST = render_host_edit.text
     Globals.TEMPERATURE = temperature_edit.text
     var temp_value = temperature_edit.text.strip_edges()
