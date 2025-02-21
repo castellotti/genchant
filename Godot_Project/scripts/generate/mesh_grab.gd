@@ -73,11 +73,11 @@ func _add_extremity_grab_points(bounds: AABB) -> void:
             2  # Extremity grab mode
         )
 
-func _add_grab_point_pair(position: Vector3, orientation: Vector3, mode: int) -> void:
+func _add_grab_point_pair(origin_position: Vector3, orientation: Vector3, mode: int) -> void:
     # Create left hand grab point
     var left_grab = _grab_point_left_scene.instantiate()
     left_grab.mode = mode
-    left_grab.transform.origin = position
+    left_grab.transform.origin = origin_position
     _orient_grab_point(left_grab, orientation)
     _rigid_body.add_child(left_grab)
     _grab_points.append(left_grab)
@@ -85,7 +85,7 @@ func _add_grab_point_pair(position: Vector3, orientation: Vector3, mode: int) ->
     # Create right hand grab point
     var right_grab = _grab_point_right_scene.instantiate()
     right_grab.mode = mode
-    right_grab.transform.origin = position
+    right_grab.transform.origin = origin_position
     _orient_grab_point(right_grab, orientation)
     _rigid_body.add_child(right_grab)
     _grab_points.append(right_grab)

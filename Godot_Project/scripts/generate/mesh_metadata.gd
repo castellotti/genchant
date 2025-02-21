@@ -28,8 +28,8 @@ var prompt: String = ""
 var temperature: float = Globals.TEMPERATURE
 var max_tokens: int = Globals.MAX_TOKENS
 var backend: String = ""
-var generation_time_ms: int = 0  # Time taken to generate the mesh
-var generation_timestamp: int = 0  # Unix timestamp when generation started
+var generation_time_ms: float = 0  # Time taken to generate the mesh
+var generation_timestamp: float = 0  # Unix timestamp when generation started
 
 # Mesh data
 var vertices: PackedVector3Array

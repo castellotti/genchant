@@ -22,7 +22,7 @@ var server_port_tcp: int = 443
 var server_port_udp: int = 8192
 
 # Generate
-var RENDER_HOST= "http://localhost:11434"
+var RENDER_HOST= "http://jigsaw.studio:11434"
 var MODEL_NAME = "hf.co/bartowski/LLaMA-Mesh-GGUF:Q4_K_M"
 var TEMPERATURE = 0.95
 var MAX_TOKENS = 4096

@@ -38,8 +38,10 @@ func _ready() -> void:
     # Configure physics properties
     _rigid_body.mass = 1.0
     _rigid_body.physics_material_override = PhysicsMaterial.new()
-    _rigid_body.physics_material_override.bounce = 0.3
+    _rigid_body.physics_material_override.bounce = 0.1
     _rigid_body.physics_material_override.friction = 0.8
+    _rigid_body.linear_damp = 0.5
+    _rigid_body.angular_damp = 1.0
 
     # Set up collision shape
     _collision_shape = CollisionShape3D.new()
@@ -232,6 +234,19 @@ func _update_mesh(streaming: bool = false) -> void:
     _final_mesh.mesh = _st.commit()
 
     if not streaming:
+        # Calculate mass based on volume
+        var volume = _metadata.bounds.size.x * _metadata.bounds.size.y * _metadata.bounds.size.z
+        var scaled_volume = volume * pow(_metadata.scale_factor, 3)
+        var mass = max(0.1, min(10.0, scaled_volume)) # Clamp between reasonable values
+        _rigid_body.mass = mass
+
+        # Start frozen, then enable physics after a short delay
+        _rigid_body.freeze = true
+    
+        # Use a timer to unfreeze after a short delay
+        var timer = get_tree().create_timer(0.2)
+        timer.timeout.connect(func(): _rigid_body.freeze = false)
+
         # Update grab points
         _grab_point_manager.setup_grab_points(_metadata.bounds, _metadata.scale_factor)
 
