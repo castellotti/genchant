@@ -89,10 +89,28 @@ func generate_mesh(prompt: String) -> void:
         print("Using model: " + Globals.MODEL_NAME)
         print("Generating mesh using MeshGenerator")
 
-    var host = Globals.RENDER_HOST.split("://")[1]
-    var port = host.split(":")[1].to_int()
-    host = host.split(":")[0]
-    var err = _http_client.connect_to_host(host, port)
+    # Determine which host to use based on environment
+    var host_url = Globals.RENDER_HOST
+    if Globals.is_running_in_web:
+        host_url = Globals.RENDER_HOST_WEBXR
+
+    # Parse URL components
+    var url_parts = host_url.split("://")
+    var protocol = url_parts[0]
+    var host_and_port = url_parts[1].split(":")
+    var host = host_and_port[0]
+
+    # Set default ports based on protocol if not specified
+    var port: int
+    if host_and_port.size() > 1:
+        port = host_and_port[1].to_int()
+    else:
+        port = 443 if protocol == "https" else 80
+
+    # Configure TLS options based on protocol
+    var tls_options = TLSOptions.client() if protocol == "https" else null
+    var err = _http_client.connect_to_host(host, port, tls_options)
+
     if err != OK:
         push_error("Failed to connect to server")
         _set_status(Status.FAILED)
