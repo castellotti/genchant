@@ -77,8 +77,9 @@ func _on_right_controller_input_float_changed(name, value):
     elif name == "grip":
         pass # Handle grip if needed
     elif name == "thumbstick_x":
-        right_joystick.x = value
-        emit_signal("joystick_moved", "right", "x", value)
+        # Invert X-axis for turning
+        right_joystick.x = -value
+        emit_signal("joystick_moved", "right", "x", -value)
     elif name == "thumbstick_y":
         right_joystick.y = value
         emit_signal("joystick_moved", "right", "y", value)
@@ -90,11 +91,11 @@ func _process(_delta):
 func _apply_movement_from_joysticks():
     # Apply left joystick to movement
     if abs(left_joystick.y) > 0.1:
-        if left_joystick.y < 0:
-            Input.action_press("move_forward", -left_joystick.y)
+        if left_joystick.y > 0:
+            Input.action_press("move_forward", left_joystick.y)
             Input.action_release("move_back")
         else:
-            Input.action_press("move_back", left_joystick.y)
+            Input.action_press("move_back", -left_joystick.y)
             Input.action_release("move_forward")
     else:
         Input.action_release("move_forward")
