@@ -132,17 +132,25 @@ func _webxr_session_started() -> void:
 
     Globals.passthrough_enabled = enable_passthrough()
 
+    # Add WebXR controller adapter to handle joystick movement
+    var webxr_controller_adapter = load("res://scripts/webxr/webxr_controller.gd").new()
+    $objects/XROrigin3D.add_child(webxr_controller_adapter)
+
+    # Add WebXR movement handler
+    var webxr_movement = load("res://scripts/webxr/webxr_movement.gd").new()
+    $objects/XROrigin3D.add_child(webxr_movement)
+
     # This will be the reference space type you ultimately got, out of the
     # types that you requested above. This is useful if you want the game to
     # work a little differently in 'bounded-floor' versus 'local-floor'.
     print ("Reference space type: " + xr_interface.reference_space_type)
- 
+
 func _webxr_session_ended() -> void:
     $ui/WebCanvasLayer.visible = true
     # If the user exits immersive mode, then we tell Godot to render to the web
     # page again.
     get_viewport().use_xr = false
- 
+
 func _webxr_session_failed(message: String) -> void:
     if interface_alerts:
         OS.alert("Failed to initialize: " + message)
