@@ -21,13 +21,13 @@ const B_BUTTON = 1
 func _ready():
     # Wait a frame to let controllers initialize
     await get_tree().process_frame
-    
+
     xr_interface = XRServer.find_interface("WebXR")
     if !xr_interface:
         print("WebXR interface not found")
         queue_free()
         return
-        
+
     # Find the controllers
     var origin = get_parent()
     for child in origin.get_children():
@@ -36,12 +36,12 @@ func _ready():
                 left_controller = child
             elif child.tracker == "right_hand":
                 right_controller = child
-    
+
     if left_controller:
         left_controller.button_pressed.connect(_on_left_controller_button_pressed)
         left_controller.button_released.connect(_on_left_controller_button_released)
         left_controller.input_float_changed.connect(_on_left_controller_input_float_changed)
-    
+
     if right_controller:
         right_controller.button_pressed.connect(_on_right_controller_button_pressed)
         right_controller.button_released.connect(_on_right_controller_button_released)
@@ -49,13 +49,13 @@ func _ready():
 
 func _on_left_controller_button_pressed(button):
     emit_signal("button_pressed", "left", button)
-    
+
 func _on_left_controller_button_released(button):
     emit_signal("button_released", "left", button)
-    
+
 func _on_right_controller_button_pressed(button):
     emit_signal("button_pressed", "right", button)
-    
+
 func _on_right_controller_button_released(button):
     emit_signal("button_released", "right", button)
 
@@ -87,7 +87,7 @@ func _on_right_controller_input_float_changed(name, value):
 func _process(_delta):
     # Simulate input events based on joystick positions
     _apply_movement_from_joysticks()
-    
+
 func _apply_movement_from_joysticks():
     # Apply left joystick to movement
     if abs(left_joystick.y) > 0.1:
@@ -100,7 +100,7 @@ func _apply_movement_from_joysticks():
     else:
         Input.action_release("move_forward")
         Input.action_release("move_back")
-    
+
     if abs(left_joystick.x) > 0.1:
         if left_joystick.x > 0:
             Input.action_press("move_right", left_joystick.x)
@@ -111,7 +111,7 @@ func _apply_movement_from_joysticks():
     else:
         Input.action_release("move_right")
         Input.action_release("move_left")
-    
+
     # Apply right joystick to rotation/camera control
     if abs(right_joystick.x) > 0.5:
         if right_joystick.x > 0:
