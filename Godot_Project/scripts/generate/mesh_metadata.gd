@@ -8,6 +8,7 @@ var initial_height: float = 0  # Initial height off the floor in meters
 var retain_vertex_spheres: bool = false  # Whether to keep vertex spheres after generation
 var retain_vertex_spheres_bounding_box: bool = false  # Whether to keep vertex spheres bounding box after generation
 var retain_final_mesh_bounding_box: bool = false  # Whether to keep final mesh bounding box after generation
+var assign_grab_points: bool = true  # Whether to add grab points to the mesh
 
 # Position offsets - Adjusted to be closer to player's origin at (0, 0, 9)
 var vertex_spheres_offset: Vector3 = Vector3(-target_size/2, target_size/2, 10.5 - target_size/2)
@@ -61,7 +62,8 @@ func to_dict() -> Dictionary:
             },
             "retain_vertex_spheres": retain_vertex_spheres,
             "retain_vertex_spheres_bounding_box": retain_vertex_spheres_bounding_box,
-            "retain_final_mesh_bounding_box": retain_final_mesh_bounding_box
+            "retain_final_mesh_bounding_box": retain_final_mesh_bounding_box,
+            "assign_grab_points": assign_grab_points,
         },
         "bounding_box_settings": {
             "vertex_spheres_enabled": vertex_spheres_bounding_box_enabled,
@@ -123,6 +125,7 @@ static func from_dict(data: Dictionary) -> MeshMetadata:
     metadata.retain_vertex_spheres = viz.get("retain_vertex_spheres", false)
     metadata.retain_vertex_spheres_bounding_box = viz.get("retain_vertex_spheres_bounding_box", true)
     metadata.retain_final_mesh_bounding_box = viz.get("retain_final_mesh_bounding_box", false)
+    metadata.assign_grab_points = viz.get("assign_grab_points", true)
     
     var spheres_offset = viz.get("vertex_spheres_offset", {})
     metadata.vertex_spheres_offset = Vector3(

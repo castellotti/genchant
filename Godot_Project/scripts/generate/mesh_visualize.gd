@@ -10,9 +10,8 @@ var _bounding_box_vertex_spheres: MeshInstance3D
 var _streaming_bounding_box: MeshInstance3D
 var _bounding_box_final_mesh: MeshInstance3D
 var _collision_shape: CollisionShape3D
-var _rigid_body: RigidBody3D
+var _rigid_body: XRToolsPickable
 var _total_vertices: int = 0
-var _grab_point_manager: GrabPointManager
 var _metadata: MeshMetadata
 
 func _ready() -> void:
@@ -31,8 +30,9 @@ func _ready() -> void:
         box_material.albedo_color = Color(1, 1, 1, _metadata.vertex_spheres_bounding_box_alpha)
         _bounding_box_vertex_spheres.material_override = box_material
 
-    # Create RigidBody3D as parent for final mesh
-    _rigid_body = RigidBody3D.new()
+    # Create XRToolsPickable (extends RigidBody3D) as parent for final mesh
+    var pickable_scene := preload("res://addons/godot-xr-tools/objects/pickable.tscn") as PackedScene
+    _rigid_body = pickable_scene.instantiate() as XRToolsPickable
     add_child(_rigid_body)
     _rigid_body.position = _metadata.final_mesh_offset
 
@@ -43,6 +43,7 @@ func _ready() -> void:
     _rigid_body.physics_material_override.friction = 0.8
     _rigid_body.linear_damp = 0.5
     _rigid_body.angular_damp = 1.0
+    _rigid_body.ranged_grab_method = XRToolsPickable.RangedMethod.SNAP
 
     # Initially disable gravity and freeze the body
     _rigid_body.gravity_scale = 0
@@ -60,10 +61,6 @@ func _ready() -> void:
     material.vertex_color_use_as_albedo = true
     material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_VERTEX
     _final_mesh.material_override = material
-
-    # Add ability to grab
-    _grab_point_manager = GrabPointManager.new(_rigid_body)
-    add_child(_grab_point_manager)
 
     # Create streaming bounding box
     _streaming_bounding_box = MeshInstance3D.new()
@@ -276,9 +273,6 @@ func _update_mesh(streaming: bool = false) -> void:
             _rigid_body.freeze = false
         )
 
-        # Update grab points
-        _grab_point_manager.setup_grab_points(_metadata.bounds, _metadata.scale_factor)
-
         # Update collision shape and bounding box with centered bounds
         var scaled_bounds = AABB(-(_metadata.bounds.size * _metadata.scale_factor) / 2,
                                    _metadata.bounds.size * _metadata.scale_factor)
@@ -302,14 +296,33 @@ func _update_collision_shape(bounds: AABB) -> void:
 func update_metadata(new_metadata: MeshMetadata) -> void:
     _metadata = new_metadata
 
+func _add_grab_points() -> void:
+    # Calculate grab point positions based on bounding box
+    var size = _metadata.bounds.size * _metadata.scale_factor
+    var grab_offset = Vector3(size.x * 0.3, size.y * 0.25, 0)
+
+    # Add left hand grab point
+    var left_grab = preload("res://addons/godot-xr-tools/objects/grab_points/grab_point_hand_left.tscn").instantiate()
+    _rigid_body.add_child(left_grab)
+    left_grab.transform.origin = Vector3(-grab_offset.x, grab_offset.y, grab_offset.z)
+    left_grab.transform = left_grab.transform.looking_at(Vector3.UP, Vector3.FORWARD)
+
+    # Add right hand grab point
+    var right_grab = preload("res://addons/godot-xr-tools/objects/grab_points/grab_point_hand_right.tscn").instantiate()
+    _rigid_body.add_child(right_grab)
+    right_grab.transform.origin = Vector3(grab_offset.x, grab_offset.y, grab_offset.z)
+    right_grab.transform = right_grab.transform.looking_at(Vector3.UP, Vector3.FORWARD)
+
+    # Add highlighting ring
+    var highlight = preload("res://addons/godot-xr-tools/objects/highlight/highlight_ring.tscn").instantiate()
+    _rigid_body.add_child(highlight)
+    highlight.transform.origin = Vector3(0, size.y * 0.1, 0)
+
 func _clear_visualization() -> void:
     # Remove all vertex spheres
     for sphere in _vertex_spheres:
         sphere.queue_free()
     _vertex_spheres.clear()
-
-    if _grab_point_manager:
-        _grab_point_manager.clear_grab_points()
 
     # Clear final mesh and bounds
     _final_mesh.mesh = null
@@ -347,5 +360,9 @@ func _on_generation_complete(success: bool) -> void:
         # Hide final mesh bounding box if retention is disabled
         if _bounding_box_final_mesh and not _metadata.retain_final_mesh_bounding_box:
             _bounding_box_final_mesh.visible = false
+
+        # Only add grab points if retention is enabled
+        if _metadata.assign_grab_points:
+            _add_grab_points()
     else:
         push_error("Mesh generation failed")

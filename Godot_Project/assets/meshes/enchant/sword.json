@@ -497,6 +497,7 @@
     },
     "retain_vertex_spheres": true,
     "retain_vertex_spheres_bounding_box": true,
-    "retain_final_mesh_bounding_box": true
+    "retain_final_mesh_bounding_box": true,
+    "assign_grab_points": false
   }
 }
