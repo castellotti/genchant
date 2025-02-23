@@ -37,7 +37,8 @@ var _metadata: MeshMetadata  # New variable to store metadata
 var _generation_start_time: int  # Track generation start time
 var _connection_timer: float = 0.0  # Track connection time
 var _current_status: Status = Status.IDLE  # Current connection status
-const vertex_spheres_render_interval: int = 1  # render on every nth vertex is received
+const vertex_spheres_render_interval: int = 1  # render on every vertex is received
+const face_render_interval: int = 1  # render on every face received
 const CONNECTION_TIMEOUT: float = 10.0  # Connection timeout in seconds
 
 func _init() -> void:
@@ -225,6 +226,8 @@ func _process_chunk(chunk: String) -> void:
     _response_data = lines[-1] if lines.size() > 0 else ""
 
 func _process_mesh_data(content: String) -> void:
+    var mesh_updated = false
+
     for c in content:
         if c == 'v' and not _parsing_faces:
             # Start new vertex
@@ -258,6 +261,10 @@ func _process_mesh_data(content: String) -> void:
 
                             # For faces with more than 3 vertices, create additional triangles
                             _index_buffer = [_index_buffer[0]]
+
+                            # Update mesh on face interval
+                            if _total_faces % face_render_interval == 0:
+                                mesh_updated = true
                 else:
                     _vertex_buffer.append(num)
                     # If we have 3 coordinates, we have a complete vertex
@@ -271,14 +278,16 @@ func _process_mesh_data(content: String) -> void:
                             print("v %d %d %d" % [vertex.x, vertex.y, vertex.z])
 
                         _vertex_buffer.clear()
-
-                        # Update bounds in metadata
                         _update_metadata_bounds()
 
-                        # Update mesh every few vertices for visual feedback
-                        if _current_vertices.size() % vertex_spheres_render_interval == 0:
-                            mesh_update.emit(_current_vertices, _current_indices)
+                        # Update mesh on vertex interval
+                        if _total_vertices % vertex_spheres_render_interval == 0:
+                            mesh_updated = true
                 _number_buffer = ""
+
+    # Emit a single update after processing the chunk if needed
+    if mesh_updated:
+        mesh_update.emit(_current_vertices, _current_indices)
 
 func _update_metadata_bounds() -> void:
     if _current_vertices.is_empty():

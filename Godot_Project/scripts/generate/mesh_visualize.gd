@@ -7,6 +7,7 @@ var _vertex_spheres_container: Node3D
 var _vertex_spheres: Array[MeshInstance3D] = []
 var _final_mesh: MeshInstance3D
 var _bounding_box_vertex_spheres: MeshInstance3D
+var _streaming_bounding_box: MeshInstance3D
 var _bounding_box_final_mesh: MeshInstance3D
 var _collision_shape: CollisionShape3D
 var _rigid_body: RigidBody3D
@@ -43,6 +44,10 @@ func _ready() -> void:
     _rigid_body.linear_damp = 0.5
     _rigid_body.angular_damp = 1.0
 
+    # Initially disable gravity and freeze the body
+    _rigid_body.gravity_scale = 0
+    _rigid_body.freeze = true
+
     # Set up collision shape
     _collision_shape = CollisionShape3D.new()
     _rigid_body.add_child(_collision_shape)
@@ -59,6 +64,15 @@ func _ready() -> void:
     # Add ability to grab
     _grab_point_manager = GrabPointManager.new(_rigid_body)
     add_child(_grab_point_manager)
+
+    # Create streaming bounding box
+    _streaming_bounding_box = MeshInstance3D.new()
+    _rigid_body.add_child(_streaming_bounding_box)
+    var streaming_box_material = StandardMaterial3D.new()
+    streaming_box_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    streaming_box_material.albedo_color = Color(1, 1, 1, _metadata.final_mesh_bounding_box_alpha)
+    _streaming_bounding_box.material_override = streaming_box_material
+    _streaming_bounding_box.visible = false
 
     # Create bounding box visualization
     if _metadata.final_mesh_bounding_box_enabled:
@@ -91,24 +105,6 @@ func generate(prompt: String) -> void:
     # Start generation
     _mesh_generator.clear()
     _mesh_generator.generate_mesh(prompt)
-
-func _clear_visualization() -> void:
-    # Remove all vertex spheres
-    for sphere in _vertex_spheres:
-        sphere.queue_free()
-    _vertex_spheres.clear()
-
-    if _grab_point_manager:
-        _grab_point_manager.clear_grab_points()
-
-    # Clear final mesh and bounds
-    _final_mesh.mesh = null
-    if _bounding_box_vertex_spheres:
-        _bounding_box_vertex_spheres.mesh = null
-    if _bounding_box_final_mesh:
-        _bounding_box_final_mesh.mesh = null
-    if _collision_shape.shape:
-        _collision_shape.shape = null
 
 func _add_vertex_sphere(new_position: Vector3) -> void:
     var sphere_mesh = SphereMesh.new()
@@ -210,20 +206,29 @@ func _update_mesh(streaming: bool = false) -> void:
     # Center vertices around origin
     var center_offset = _metadata.bounds.position + (_metadata.bounds.size / 2)
 
-    # Add vertices with height-based coloring
-    for vertex in _metadata.vertices:
+    # Add vertices with coloring
+    for i in range(_metadata.vertices.size()):
+        var vertex = _metadata.vertices[i]
         var centered_vertex = vertex - center_offset
         var scaled_vertex = centered_vertex * _metadata.scale_factor
-        var y_normalized: float
+
+        var color: Color
         if streaming:
-            y_normalized = 0.5
+            # Matrix-style green digital rain effect during streaming
+            # Vary the green intensity and alpha based on vertex order
+            var progress = float(i) / _metadata.vertices.size()
+            var green_intensity = randf_range(0.5, 1.0)  # Random green intensity
+            var alpha = randf_range(0.7, 1.0)  # Slight transparency variation
+            color = Color(0.0, green_intensity, 0.0, alpha)  # Pure green with varying intensity
         else:
-            y_normalized = (vertex.y - _metadata.bounds.position.y) / _metadata.bounds.size.y if _metadata.bounds.size.y > 0 else 0.0
-        var color = Color(y_normalized, 0.0, 1.0 - y_normalized, 1.0)
+            # Final mesh uses height-based coloring
+            var y_normalized = (vertex.y - _metadata.bounds.position.y) / _metadata.bounds.size.y if _metadata.bounds.size.y > 0 else 0.0
+            color = Color(y_normalized, 0.0, 1.0 - y_normalized, 1.0)
+
         _st.set_color(color)
         _st.add_vertex(scaled_vertex)
 
-    # Add faces
+    # Add faces with current indices
     if not _metadata.indices.is_empty():
         for i in range(0, _metadata.indices.size(), 3):
             _st.add_index(_metadata.indices[i])
@@ -231,21 +236,45 @@ func _update_mesh(streaming: bool = false) -> void:
             _st.add_index(_metadata.indices[i + 2])
 
     _st.generate_normals()
-    _final_mesh.mesh = _st.commit()
+    var new_mesh = _st.commit()
+    _final_mesh.mesh = new_mesh
+
+    # Handle streaming visualization and physics
+    if streaming:
+        if not _metadata.indices.is_empty() and not _rigid_body.visible:
+            _rigid_body.visible = true
+        
+        # Keep physics disabled during streaming
+        _rigid_body.freeze = true
+        _rigid_body.gravity_scale = 0
+        
+        # Update and show streaming bounding box
+        var scaled_bounds = AABB(-(_metadata.bounds.size * _metadata.scale_factor) / 2,
+                               _metadata.bounds.size * _metadata.scale_factor)
+        scaled_bounds = scaled_bounds.grow(0.1)  # Small padding
+        _update_bounding_box(_streaming_bounding_box, scaled_bounds)
+        _streaming_bounding_box.visible = true
+        
+        # Keep vertex spheres bounding box visible during streaming
+        if _bounding_box_vertex_spheres:
+            _bounding_box_vertex_spheres.visible = true
 
     if not streaming:
-        # Calculate mass based on volume
+        # Hide streaming bounding box
+        _streaming_bounding_box.visible = false
+
+        # Final mesh updates - restore physics
         var volume = _metadata.bounds.size.x * _metadata.bounds.size.y * _metadata.bounds.size.z
         var scaled_volume = volume * pow(_metadata.scale_factor, 3)
-        var mass = max(0.1, min(10.0, scaled_volume)) # Clamp between reasonable values
+        var mass = max(0.1, min(10.0, scaled_volume))
         _rigid_body.mass = mass
 
-        # Start frozen, then enable physics after a short delay
-        _rigid_body.freeze = true
-
-        # Use a timer to unfreeze after a short delay
+        # Enable gravity and physics after a short delay
         var timer = get_tree().create_timer(0.2)
-        timer.timeout.connect(func(): _rigid_body.freeze = false)
+        timer.timeout.connect(func():
+            _rigid_body.gravity_scale = 1
+            _rigid_body.freeze = false
+        )
 
         # Update grab points
         _grab_point_manager.setup_grab_points(_metadata.bounds, _metadata.scale_factor)
@@ -272,6 +301,27 @@ func _update_collision_shape(bounds: AABB) -> void:
 
 func update_metadata(new_metadata: MeshMetadata) -> void:
     _metadata = new_metadata
+
+func _clear_visualization() -> void:
+    # Remove all vertex spheres
+    for sphere in _vertex_spheres:
+        sphere.queue_free()
+    _vertex_spheres.clear()
+
+    if _grab_point_manager:
+        _grab_point_manager.clear_grab_points()
+
+    # Clear final mesh and bounds
+    _final_mesh.mesh = null
+    if _bounding_box_vertex_spheres:
+        _bounding_box_vertex_spheres.mesh = null
+    if _bounding_box_final_mesh:
+        _bounding_box_final_mesh.mesh = null
+    if _streaming_bounding_box:
+        _streaming_bounding_box.mesh = null
+        _streaming_bounding_box.visible = false
+    if _collision_shape.shape:
+        _collision_shape.shape = null
 
 func _on_generation_complete(success: bool) -> void:
     if success:
