@@ -80,6 +80,22 @@ ollama serve
 python3 src/server.py --host 0.0.0.0 --port 11434
 ```
 
+#### Docker with CUDA (NVIDIA Container Toolkit)
+**Note**: Best results, fastest
+- Recommended: NVIDIA card with 16 GB+ of VRAM (3090, 4080, 4090, 5080, 5090, etc.)
+- If [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) with [CUDA](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_local) support is available on the system:
+```shell
+docker run \
+  --gpus all \
+  -p 11434:11434   \
+  -v ${PWD}/logs:/logs \
+  -v ${HOME}/.cache/huggingface:/root/.cache/huggingface   \
+  ghcr.io/castellotti/generate-glb/generate-glb:main-cuda   \
+  python3 /app/src/server.py \
+    --host 0.0.0.0 \
+    --port 11434
+```
+
 ## Source Code Dependencies
 
 ### Apple Vision Pro
