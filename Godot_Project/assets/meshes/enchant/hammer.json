@@ -1285,5 +1285,9 @@
       "y": 0.5,
       "z": 7.5
     }
+  },
+  "rendering_settings" : {
+    "reverse_winding_order": true,
+    "culling_mode": 2
   }
 }

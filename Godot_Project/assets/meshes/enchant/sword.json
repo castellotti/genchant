@@ -499,5 +499,9 @@
     "retain_vertex_spheres_bounding_box": true,
     "retain_final_mesh_bounding_box": true,
     "assign_grab_points": false
+  },
+  "rendering_settings" : {
+    "reverse_winding_order": true,
+    "culling_mode": 2
   }
 }

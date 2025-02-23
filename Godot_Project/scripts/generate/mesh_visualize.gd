@@ -225,38 +225,57 @@ func _update_mesh(streaming: bool = false) -> void:
         _st.set_color(color)
         _st.add_vertex(scaled_vertex)
 
-    # Add faces with current indices
+    # Add faces with current indices - reverse winding order to fix normals
     if not _metadata.indices.is_empty():
         for i in range(0, _metadata.indices.size(), 3):
-            _st.add_index(_metadata.indices[i])
-            _st.add_index(_metadata.indices[i + 1])
-            _st.add_index(_metadata.indices[i + 2])
+            if _metadata.reverse_winding_order:
+                # Reverse winding order by swapping the second and third indices
+                _st.add_index(_metadata.indices[i])
+                _st.add_index(_metadata.indices[i + 2])
+                _st.add_index(_metadata.indices[i + 1])
+            else:
+                # Standard winding order
+                _st.add_index(_metadata.indices[i])
+                _st.add_index(_metadata.indices[i + 1])
+                _st.add_index(_metadata.indices[i + 2])
 
     _st.generate_normals()
     var new_mesh = _st.commit()
     _final_mesh.mesh = new_mesh
 
+    # Update material settings to handle face culling
+    var material = _final_mesh.material_override as StandardMaterial3D
+    if not material:
+        material = StandardMaterial3D.new()
+
+        # Apply culling mode
+        material.cull_mode = _metadata.culling_mode
+
+        material.vertex_color_use_as_albedo = true
+        material.shading_mode = BaseMaterial3D.SHADING_MODE_PER_VERTEX
+        _final_mesh.material_override = material
+
     # Handle streaming visualization and physics
     if streaming:
         if not _metadata.indices.is_empty() and not _rigid_body.visible:
             _rigid_body.visible = true
-        
+
         # Keep physics disabled during streaming
         _rigid_body.freeze = true
         _rigid_body.gravity_scale = 0
-        
+
         # Update and show streaming bounding box
         var scaled_bounds = AABB(-(_metadata.bounds.size * _metadata.scale_factor) / 2,
                                _metadata.bounds.size * _metadata.scale_factor)
         scaled_bounds = scaled_bounds.grow(0.1)  # Small padding
         _update_bounding_box(_streaming_bounding_box, scaled_bounds)
         _streaming_bounding_box.visible = true
-        
+
         # Keep vertex spheres bounding box visible during streaming
         if _bounding_box_vertex_spheres:
             _bounding_box_vertex_spheres.visible = true
 
-    if not streaming:
+    else:
         # Hide streaming bounding box
         _streaming_bounding_box.visible = false
 

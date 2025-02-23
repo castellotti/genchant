@@ -10,6 +10,14 @@ var retain_vertex_spheres_bounding_box: bool = false  # Whether to keep vertex s
 var retain_final_mesh_bounding_box: bool = false  # Whether to keep final mesh bounding box after generation
 var assign_grab_points: bool = true  # Whether to add grab points to the mesh
 
+# Rendering settings
+var reverse_winding_order: bool = true  # Whether to reverse triangle winding order
+# culling_mode options
+# BaseMaterial3D.CULL_BACK [0] - Only shows front faces (default behavior in Godot's StandardMaterial3D)
+# BaseMaterial3D.CULL_FRONT [1] - Only shows back faces
+# BaseMaterial3D.CULL_DISABLED [2] - Shows both sides of faces
+var culling_mode: int = BaseMaterial3D.CULL_DISABLED
+
 # Position offsets - Adjusted to be closer to player's origin at (0, 0, 9)
 var vertex_spheres_offset: Vector3 = Vector3(-target_size/2, target_size/2, 10.5 - target_size/2)
 var final_mesh_offset: Vector3 = Vector3(0, 0, 10.5)
@@ -19,6 +27,7 @@ var vertex_spheres_bounding_box_enabled: bool = true
 var final_mesh_bounding_box_enabled: bool = true
 var vertex_spheres_bounding_box_alpha: float = 0.05
 var final_mesh_bounding_box_alpha: float = 0.2
+
 # Padding will be adjusted by scale factor in the visualizer
 var vertex_spheres_bounding_box_padding: float = 0.1 + sphere_radius * 2  # Diameter of sphere
 var final_mesh_bounding_box_padding: float = 0.1
@@ -64,6 +73,10 @@ func to_dict() -> Dictionary:
             "retain_vertex_spheres_bounding_box": retain_vertex_spheres_bounding_box,
             "retain_final_mesh_bounding_box": retain_final_mesh_bounding_box,
             "assign_grab_points": assign_grab_points,
+        },
+        "rendering_settings" : {
+            "reverse_winding_order": reverse_winding_order,
+            "culling_mode": culling_mode
         },
         "bounding_box_settings": {
             "vertex_spheres_enabled": vertex_spheres_bounding_box_enabled,
@@ -140,7 +153,12 @@ static func from_dict(data: Dictionary) -> MeshMetadata:
         mesh_offset.get("y", 0),
         mesh_offset.get("z", 0)
     )
-    
+
+    # Rendering settings
+    var rs = data.get("rendering_settings", {})
+    metadata.reverse_winding_order = rs.get("reverse_winding_order", true)
+    metadata.culling_mode = rs.get("culling_mode", BaseMaterial3D.CULL_DISABLED)
+
     # Bounding box settings
     var bb = data.get("bounding_box_settings", {})
     metadata.final_mesh_bounding_box_enabled = bb.get("final_mesh_enabled", true)
