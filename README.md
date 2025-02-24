@@ -8,6 +8,9 @@ Put on your robe and wizard hat!
 
 "Genchanted" was created for the [Godot XR Game Jam (Feb 2025)](https://itch.io/jam/godot-xr-game-jam-feb-2025) with the theme "Enchanted!" as a proof-of-concept tool for using AI to generate 3D objects directly into Godot, as if by magic.
 
+[![YouTube Video](https://img.youtube.com/vi/bzf0OC3e_ww/maxresdefault.jpg)](https://www.youtube.com/watch?v=bzf0OC3e_ww)
+Demonstration video
+
 <div style="text-align:center;">
   <img src="docs/images/screenshot-xr_simulator-01-generating_sword-1024.png" alt="Generating a sword in XR Simulator" width="360"/>
 </div>
