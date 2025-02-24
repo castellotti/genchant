@@ -31,9 +31,8 @@ var visualizations: Dictionary = {
 }
 
 # Generate
-#var RENDER_HOST = "http://localhost:11434"  # default
-var RENDER_HOST = "https://jigsaw.studio"  # temporary for Godot XR Game Jam
-var RENDER_HOST_WEBXR = "https://jigsaw.studio"
+var RENDER_HOST = "http://localhost:11434"
+var RENDER_HOST_WEBXR = "https://localhost"
 var MODEL_NAME = "hf.co/bartowski/LLaMA-Mesh-GGUF:Q4_K_M"
 var TEMPERATURE = 0.95
 var MAX_TOKENS = 4096

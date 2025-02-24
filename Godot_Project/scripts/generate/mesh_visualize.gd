@@ -213,7 +213,6 @@ func _update_mesh(streaming: bool = false) -> void:
         if streaming:
             # Matrix-style green digital rain effect during streaming
             # Vary the green intensity and alpha based on vertex order
-            var progress = float(i) / _metadata.vertices.size()
             var green_intensity = randf_range(0.5, 1.0)  # Random green intensity
             var alpha = randf_range(0.7, 1.0)  # Slight transparency variation
             color = Color(0.0, green_intensity, 0.0, alpha)  # Pure green with varying intensity
